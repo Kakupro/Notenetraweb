@@ -1,0 +1,83 @@
+/* Chat Widget Specific Styles for Better Visibility */
+/* TEST: This CSS file is loaded - Chat widget should have black text in light mode */
+
+/* Bot message styling for better contrast */
+.chat-bot-message,
+.chat-bot-message p,
+.chat-bot-message * {
+  background-color: #f3f4f6 !important;
+  color: #000000 !important;
+  border: 1px solid #e5e7eb !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+}
+
+.dark .chat-bot-message,
+.dark .chat-bot-message p,
+.dark .chat-bot-message * {
+  background-color: #374151 !important;
+  color: #ffffff !important;
+  border: 1px solid #4b5563 !important;
+  font-weight: 500 !important;
+}
+
+/* User message styling */
+.chat-user-message {
+  background-color: #3b82f6;
+  color: #ffffff;
+}
+
+.dark .chat-user-message {
+  background-color: #1d4ed8;
+  color: #ffffff;
+}
+
+/* Chat panel background */
+.chat-panel {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+
+.dark .chat-panel {
+  background-color: #111827;
+  border: 1px solid #374151;
+}
+
+/* Chat input styling */
+.chat-input {
+  background-color: #ffffff;
+  color: #1f2937;
+  border: 1px solid #d1d5db;
+}
+
+.dark .chat-input {
+  background-color: #374151;
+  color: #ffffff;
+  border: 1px solid #4b5563;
+}
+
+/* Quick action buttons */
+.chat-quick-button {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.dark .chat-quick-button {
+  background-color: #1e3a8a;
+  color: #93c5fd;
+  border: 1px solid #1e40af;
+}
+
+/* Chat header */
+.chat-header {
+  background-color: #f9fafb;
+  color: #1f2937;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dark .chat-header {
+  background-color: #374151;
+  color: #ffffff;
+  border-bottom: 1px solid #4b5563;
+}

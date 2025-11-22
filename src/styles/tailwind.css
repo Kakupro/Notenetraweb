@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Theme Colors (Default) */
+    --background: #ffffff; /* White */
+    --foreground: #0a0a0a; /* Dark black */
+    --border: #e5e7eb; /* Light gray-200 */
+    --input: #f9fafb; /* Light gray-50 */
+    --ring: #2563eb; /* Blue-600 */
+
+    /* Card Colors */
+    --card: #ffffff; /* White card */
+    --card-foreground: #0a0a0a; /* Dark text */
+
+    /* Popover Colors */
+    --popover: #ffffff; /* White popover */
+    --popover-foreground: #0a0a0a; /* Dark text */
+
+    /* Muted Colors */
+    --muted: #f3f4f6; /* Light gray-100 */
+    --muted-foreground: #6b7280; /* Gray-500 */
+
+    /* Primary Colors */
+    --primary: #2563eb; /* Blue-600 primary */
+    --primary-foreground: #ffffff; /* White text */
+
+    /* Secondary Colors */
+    --secondary: #4f46e5; /* Indigo-600 secondary */
+    --secondary-foreground: #ffffff; /* White text */
+
+    /* Accent Colors */
+    --accent: #2563eb; /* Blue-600 accent */
+    --accent-foreground: #ffffff; /* White text */
+
+    /* Success Colors */
+    --success: #10b981; /* emerald-600 */
+    --success-foreground: #ffffff; /* White text */
+
+    /* Warning Colors */
+    --warning: #f59e0b; /* amber-600 */
+    --warning-foreground: #ffffff; /* White text */
+
+    /* Error/Destructive Colors */
+    --error: #ef4444; /* red-600 */
+    --error-foreground: #ffffff; /* White text */
+    --destructive: #ef4444; /* red-600 */
+    --destructive-foreground: #ffffff; /* White text */
+  }
+
+  .dark {
+    /* Dark Theme Colors */
+    --background: #0a0a0a; /* Dark black */
+    --foreground: #ffffff; /* White text */
+    --border: #333333; /* Dark border */
+    --input: #2a2a2a; /* Dark input */
+    --ring: #0891b2; /* Teal/cyan-blue ring */
+
+    /* Card Colors */
+    --card: #1e1e1e; /* Dark card */
+    --card-foreground: #ffffff; /* White text */
+
+    /* Popover Colors */
+    --popover: #1e1e1e; /* Dark popover */
+    --popover-foreground: #ffffff; /* White text */
+
+    /* Muted Colors */
+    --muted: #1a1a1a; /* Dark muted */
+    --muted-foreground: #a0a0a0; /* Muted text */
+
+    /* Primary Colors */
+    --primary: #0891b2; /* Teal/cyan-blue primary */
+    --primary-foreground: #ffffff; /* White text */
+
+    /* Secondary Colors */
+    --secondary: #0d9488; /* Teal secondary */
+    --secondary-foreground: #ffffff; /* White text */
+
+    /* Accent Colors */
+    --accent: #0891b2; /* Teal/cyan-blue accent */
+    --accent-foreground: #ffffff; /* White text */
+
+    /* Success Colors */
+    --success: #10b981; /* emerald-600 */
+    --success-foreground: #ffffff; /* White text */
+
+    /* Warning Colors */
+    --warning: #f59e0b; /* amber-600 */
+    --warning-foreground: #ffffff; /* White text */
+
+    /* Error/Destructive Colors */
+    --error: #ef4444; /* red-600 */
+    --error-foreground: #ffffff; /* White text */
+    --destructive: #ef4444; /* red-600 */
+    --destructive-foreground: #ffffff; /* White text */
+  }
+  
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  html {
+  }
+  
+  #root {
+    min-height: 100vh;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+  }
+  
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  .shadow-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .shadow-interactive {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .transition-micro {
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .transition-smooth {
+    transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .transition-large {
+    transition: all 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hover-lift:hover {
+    transform: scale(1.02);
+  }
+  
+  .nav-spacing {
+    padding-left: clamp(1rem, 4vw, 2rem);
+    padding-right: clamp(1rem, 4vw, 2rem);
+  }
+  
+  .content-spacing {
+    padding-left: clamp(1rem, 4vw, 2rem);
+    padding-right: clamp(1rem, 4vw, 2rem);
+  }
+  
+  /* Dark Theme Utilities */
+}
