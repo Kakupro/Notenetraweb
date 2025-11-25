@@ -60,7 +60,7 @@ const ChatbotPage = () => {
     const apiKey = import.meta?.env?.VITE_GEMINI_API_KEY || 'AIzaSyBNIQxuEHEQvP1JZIloAI0WFNIP2EWqhj8';
 
     const preferred = import.meta?.env?.VITE_GEMINI_MODEL || 'gemini-1.5-flash';
-    const candidateModels = [preferred, 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.0-pro'];
+    const candidateModels = [preferred, 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-pro'];
 
     const contents = [];
     history.forEach(m => {
