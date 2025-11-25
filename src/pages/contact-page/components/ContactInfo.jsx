@@ -7,26 +7,26 @@ const ContactInfo = () => {
     {
       icon: 'Phone',
       title: 'Sales Inquiries',
-      primary: '+91 98765 43210',
-      secondary: '+91 87654 32109',
+      primary: 'Chaitanya Sethi',
+      secondary: '+91 9911940639',
       description: 'Mon-Fri, 9:00 AM - 6:00 PM IST',
-      action: () => window.open('tel:+919876543210')
+      action: () => window.open('tel:+919911940639')
     },
     {
       icon: 'Mail',
       title: 'Email Support',
-      primary: 'sales@notenetra.com',
-      secondary: 'support@notenetra.com',
+      primary: 'chaitanyasethi3336@gmail.com',
+      secondary: null,
       description: 'Response within 24 hours',
-      action: () => window.open('mailto:sales@notenetra.com')
+      action: () => window.open('mailto:chaitanyasethi3336@gmail.com')
     },
     {
       icon: 'MapPin',
       title: 'Business Address',
-      primary: 'NoteNetra Technologies Pvt Ltd',
-      secondary: 'Sector 62, Noida, UP 201309',
+      primary: 'C137 3rd floor Avantika rohini delhi 110085',
+      secondary: null,
       description: 'Visit by appointment only',
-      action: () => window.open('https://maps.google.com/?q=28.6139,77.2090')
+      action: () => window.open('https://maps.google.com/?q=28.7107,77.1167')
     },
     {
       icon: 'Clock',
@@ -125,7 +125,7 @@ const ContactInfo = () => {
             Our Location
           </h3>
           <p className="text-muted-foreground text-sm">
-            Visit our office in Noida for in-person consultations and device demonstrations.
+            Visit our office in Rohini for in-person consultations and device demonstrations.
           </p>
         </div>
         <div className="h-64 relative">
@@ -135,7 +135,7 @@ const ContactInfo = () => {
             loading="lazy"
             title="NoteNetra Office Location"
             referrerPolicy="no-referrer-when-downgrade"
-            src="https://www.google.com/maps?q=28.6139,77.2090&z=14&output=embed"
+            src="https://www.google.com/maps?q=28.7107,77.1167&z=14&output=embed"
             className="border-0"
           />
         </div>
