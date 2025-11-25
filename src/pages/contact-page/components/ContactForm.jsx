@@ -3,6 +3,11 @@ import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
 import Icon from '../../../components/AppIcon';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { app } from '../../../firebase';
+
+const functions = getFunctions(app);
+const submitContactForm = httpsCallable(functions, 'submitContactForm');
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -96,11 +101,15 @@ const ContactForm = () => {
 
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+    try {
+      await submitContactForm(formData);
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error("Error submitting contact form:", error);
+      alert("There was an error submitting your form. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
 
     // Reset form after success message
     setTimeout(() => {

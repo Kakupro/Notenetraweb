@@ -338,7 +338,7 @@ const PricingPage = () => {
             <div>
               <h4 className="font-semibold text-foreground mb-4">Support</h4>
               <div className="space-y-2">
-                <a href="mailto:support@notenetra.com" className="block text-muted-foreground hover:text-primary transition-micro">
+                <a href="mailto:chaitanyasethi3336@gmail.com" className="block text-muted-foreground hover:text-primary transition-micro">
                   Email Support
                 </a>
                 <a href="tel:+911800123456" className="block text-muted-foreground hover:text-primary transition-micro">
@@ -358,12 +358,16 @@ const PricingPage = () => {
               <h4 className="font-semibold text-foreground mb-4">Contact</h4>
               <div className="space-y-2 text-muted-foreground">
                 <div className="flex items-center space-x-2">
-                  <Icon name="Mail" size={16} strokeWidth={2} />
-                  <span>support@notenetra.com</span>
+                  <Icon name="Phone" size={16} strokeWidth={2} />
+                  <span>+91 9911940639</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Icon name="Phone" size={16} strokeWidth={2} />
-                  <span>+91 1800 123 456</span>
+                  <span>+91 9625652435</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Icon name="Mail" size={16} strokeWidth={2} />
+                  <span>chaitanyasethi3336@gmail.com</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Icon name="MapPin" size={16} strokeWidth={2} />

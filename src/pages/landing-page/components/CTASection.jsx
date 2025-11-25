@@ -249,9 +249,9 @@ const CTASection = () => {
                 iconName="Phone"
                 iconPosition="left"
                 className="bg-white text-primary hover:bg-muted-foreground/10"
-                onClick={() => window.location.href = 'tel:+918888888888'}
+                onClick={() => window.location.href = 'tel:+919911940639'}
               >
-                Call Now: +91 88888 88888
+                Call Now: +91 9911940639
               </Button>
               <Button
                 variant="outline"

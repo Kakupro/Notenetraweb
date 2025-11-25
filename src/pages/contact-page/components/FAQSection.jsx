@@ -92,14 +92,14 @@ const FAQSection = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={() => window.open('tel:+919876543210')}
+                onClick={() => window.open('tel:+919911940639')}
                 className="inline-flex items-center space-x-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-micro text-sm font-medium"
               >
                 <Icon name="Phone" size={16} strokeWidth={2} />
                 <span>Call Sales Team</span>
               </button>
               <button
-                onClick={() => window.open('mailto:support@notenetra.com')}
+                onClick={() => window.open('mailto:chaitanyasethi3336@gmail.com')}
                 className="inline-flex items-center space-x-2 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted transition-micro text-sm font-medium"
               >
                 <Icon name="Mail" size={16} strokeWidth={2} />

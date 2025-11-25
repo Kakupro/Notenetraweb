@@ -129,8 +129,9 @@ const LandingPage = () => {
               <div>
                 <h4 className="font-semibold text-foreground mb-4">Contact</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>+91 88888 88888</li>
-                  <li>support@notenetra.com</li>
+                  <li>+91 9911940639</li>
+                  <li>+91 9625652435</li>
+                  <li>chaitanyasethi3336@gmail.com</li>
                   <li>Mumbai, Maharashtra</li>
                   <li>India</li>
                 </ul>
