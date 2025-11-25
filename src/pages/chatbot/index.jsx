@@ -57,7 +57,7 @@ const ChatbotPage = () => {
   // Removed custom fallback endpoint; Gemini is the sole source for answers
 
   const callGeminiAI = async (userText, history) => {
-    const apiKey = import.meta?.env?.VITE_GEMINI_API_KEY || 'AIzaSyAj5nqO8k1cmguQ9bpfiCTch8w5NtPmI9A';
+    const apiKey = import.meta?.env?.VITE_GEMINI_API_KEY || 'AIzaSyBNIQxuEHEQvP1JZIloAI0WFNIP2EWqhj8';
 
     const preferred = import.meta?.env?.VITE_GEMINI_MODEL || 'gemini-1.5-flash';
     const candidateModels = [preferred, 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.0-pro'];
