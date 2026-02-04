@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
@@ -84,60 +85,75 @@ const GuidedTour = ({ isActive, onClose, onComplete }) => {
 
   return (
     <>
-      {/* Overlay */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300">
-        {/* Tour Tooltip */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-dark-bg-card rounded-xl shadow-2xl border border-dark-border-primary p-6 max-w-md w-full mx-4 animate-fade-in">
-          {/* Progress Bar */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-dark-text-secondary">
-                Step {currentStep + 1} of {tourSteps?.length}
-              </span>
-              <button
-                onClick={skipTour}
-                className="text-dark-text-muted hover:text-dark-text-primary transition-colors"
-              >
-                <Icon name="X" size={20} />
-              </button>
+      {/* Overlay with Backdrop Blur */}
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-[9999] transition-all duration-500 animate-fade-in" />
+
+      {/* Tour Tooltip centered for clarity */}
+      <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 pointer-events-none">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="pointer-events-auto bg-[#1a1c24] border border-white/10 rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] p-8 max-w-lg w-full relative overflow-hidden"
+        >
+          {/* Decorative Glow */}
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-[60px]" />
+
+          {/* Header */}
+          <div className="relative z-10 flex items-center justify-between mb-8">
+            <div className="flex items-center space-x-3">
+              <div className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
+                <span className="text-xs font-bold text-primary uppercase tracking-widest">
+                  Step {currentStep + 1} of {tourSteps?.length}
+                </span>
+              </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${((currentStep + 1) / tourSteps?.length) * 100}%` }}
-              />
-            </div>
+            <button
+              onClick={skipTour}
+              className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-all"
+            >
+              <Icon name="X" size={20} />
+            </button>
+          </div>
+
+          {/* Progress Bar Container */}
+          <div className="relative z-10 w-full h-1.5 bg-white/5 rounded-full mb-10 overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${((currentStep + 1) / tourSteps?.length) * 100}%` }}
+              className="h-full bg-gradient-to-r from-primary to-accent"
+            />
           </div>
 
           {/* Content */}
-          <div className="mb-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-3">
+          <div className="relative z-10 mb-10">
+            <h3 className="text-3xl font-bold text-white mb-4 tracking-tight leading-tight">
               {currentTourStep?.title}
             </h3>
-            <p className="text-gray-600 leading-relaxed">
+            <p className="text-[16px] text-gray-400 leading-relaxed font-medium">
               {currentTourStep?.content}
             </p>
           </div>
 
           {/* Navigation */}
-          <div className="flex items-center justify-between">
+          <div className="relative z-10 flex items-center justify-between">
             <Button
               variant="outline"
               onClick={prevStep}
               disabled={currentStep === 0}
-              iconName="ChevronLeft"
-              iconPosition="left"
+              className="border-white/10 text-white/70 hover:text-white hover:bg-white/5 px-6 py-6 rounded-2xl transition-all disabled:opacity-20"
             >
-              Previous
+              <div className="flex items-center space-x-2">
+                <Icon name="ChevronLeft" size={18} />
+                <span className="font-bold">Previous</span>
+              </div>
             </Button>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2.5">
               {tourSteps?.map((_, index) => (
                 <div
                   key={index}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    index === currentStep ? 'bg-blue-600' : 'bg-gray-300'
-                  }`}
+                  className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${index === currentStep ? 'bg-primary scale-125 shadow-[0_0_12px_rgba(8,145,178,0.5)]' : 'bg-white/10'
+                    }`}
                 />
               ))}
             </div>
@@ -146,41 +162,37 @@ const GuidedTour = ({ isActive, onClose, onComplete }) => {
               <Button
                 variant="default"
                 onClick={completeTour}
-                iconName="CheckCircle"
-                iconPosition="right"
+                className="bg-primary text-white hover:bg-primary/90 px-8 py-6 rounded-2xl font-bold shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95"
               >
-                Get Started
+                <div className="flex items-center space-x-2">
+                  <span>Get Started</span>
+                  <Icon name="CheckCircle" size={18} />
+                </div>
               </Button>
             ) : (
               <Button
                 variant="default"
                 onClick={nextStep}
-                iconName="ChevronRight"
-                iconPosition="right"
+                className="bg-primary text-white hover:bg-primary/90 px-8 py-6 rounded-2xl font-bold shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95"
               >
-                Next
+                <div className="flex items-center space-x-2">
+                  <span>Next Step</span>
+                  <Icon name="ChevronRight" size={18} />
+                </div>
               </Button>
             )}
           </div>
 
-          {/* Skip Option */}
-          <div className="text-center mt-4">
+          {/* Skip Footer */}
+          <div className="relative z-10 flex justify-center mt-8">
             <button
               onClick={skipTour}
-              className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              className="text-xs font-bold text-gray-500 hover:text-white uppercase tracking-widest transition-colors py-2 px-4 rounded-xl hover:bg-white/5"
             >
-              Skip tour
+              Skip Full Tour
             </button>
           </div>
-        </div>
-
-        {/* Spotlight Effect (Optional Enhancement) */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="relative w-full h-full">
-            {/* This could be enhanced to highlight specific elements */}
-            <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white bg-opacity-10 rounded-full blur-xl animate-pulse" />
-          </div>
-        </div>
+        </motion.div>
       </div>
     </>
   );
