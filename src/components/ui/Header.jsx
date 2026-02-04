@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import Icon from '../AppIcon';
 import Button from './Button';
 import Logo from './Logo';
@@ -175,8 +176,8 @@ const Header = () => {
                   key={item?.path}
                   to={item?.path}
                   className={`flex items-center space-x-4 px-4 py-4 rounded-2xl text-base font-bold transition-all duration-300 ${isActivePath(item?.path)
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-foreground/70 hover:text-foreground hover:bg-muted/50'
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-foreground/70 hover:text-foreground hover:bg-muted/50'
                     }`}
                 >
                   <Icon
