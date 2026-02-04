@@ -1,23 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-// The `useNavigate` hook is no longer used in this component as the "View Full Chat" button has been removed.
-// import { useNavigate } from 'react-router-dom';
-import Icon from './AppIcon'; // Assuming AppIcon is available
-import '../styles/chatWidget.css'; // Import custom chat styles
+import Icon from './AppIcon';
+import { LOGO_CONFIG } from '../utils/logoConfig';
+import '../styles/chatWidget.css';
 
-const ChatWidget = ({ catchyLine = "Hi there! Have a question?", agentImage = "/assets/images/note.jpeg" }) => {
-  const [showGreetingBubble, setShowGreetingBubble] = useState(true);
+const ChatWidget = ({ catchyLine = "Smart insights for your business", agentImage = LOGO_CONFIG.imagePath }) => {
+  const [showGreetingBubble, setShowGreetingBubble] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [isChatPanelOpen, setIsChatPanelOpen] = useState(false); // Controls the main sliding chat panel
+  const [isChatPanelOpen, setIsChatPanelOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { id: 1, text: "Welcome to NoteNetra! How can I help you today with our platform or products?", sender: "bot" },
+    { id: 1, text: "Welcome to NoteNetra! I'm your AI assistant. How can I help you grow your business today?", sender: "bot" },
   ]);
   const [inputMessage, setInputMessage] = useState("");
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
-  // const navigate = useNavigate(); // Removed as per user request
 
-  // Predefined questions and answers for quick responses
+  // Predefined questions and answers for quick responses (Logic unchanged)
   const predefinedResponses = {
     "what is notenetra": "NoteNetra is a smart IIoT platform that helps Indian MSMEs track cash and UPI transactions, gain business insights, build credit visibility, and improve loan eligibility.",
     "how does the notenetra device work": "Our plug-and-play device automatically captures and categorizes every cash and UPI transaction in real-time. It then processes this data to provide insights and update your financial profile.",
@@ -27,221 +25,240 @@ const ChatWidget = ({ catchyLine = "Hi there! Have a question?", agentImage = "/
     "order device": "You can order the NoteNetra device directly from our website by visiting the 'Contact Us' page to get started.",
   };
 
-  // Show greeting bubble after a delay
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowGreetingBubble(true);
-    }, 2000); // Show bubble after 2 seconds
+    }, 3000);
     return () => clearTimeout(timer);
   }, []);
 
-  // Enhanced auto-scroll functionality
   useEffect(() => {
-    if (messagesEndRef.current && chatContainerRef.current) {
-      // Check if user is already at the bottom
-      const chatContainer = chatContainerRef.current;
-      const isAtBottom = chatContainer.scrollHeight - chatContainer.scrollTop <= chatContainer.clientHeight + 100;
-      
-      if (isAtBottom) {
-        // Smooth scroll to bottom
-        messagesEndRef.current.scrollIntoView({ 
-          behavior: "smooth",
-          block: "end"
-        });
-      } else {
-        // If user has scrolled up, don't auto-scroll but show a subtle indicator
-        // You could add a "new message" indicator here if needed
-      }
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
-  // Handle opening/closing the main chat panel
   const toggleChatPanel = () => {
     setIsChatPanelOpen((prev) => !prev);
-    setShowGreetingBubble(false); // Hide greeting bubble when panel opens
+    setShowGreetingBubble(false);
   };
 
   const handleSendMessage = (text = inputMessage) => {
     if (text.trim() === "") return;
 
-    const newUserMessage = { id: messages.length + 1, text: text, sender: "user" };
+    const newUserMessage = { id: Date.now(), text: text, sender: "user" };
     setMessages((prevMessages) => [...prevMessages, newUserMessage]);
     setInputMessage("");
 
-    // Check for predefined response
-    let normalizedText = text.toLowerCase().trim();
-    // Remove punctuation for better matching against predefined responses
-    normalizedText = normalizedText.replace(/[?.,!]/g, '');
+    let normalizedText = text.toLowerCase().trim().replace(/[?.,!]/g, '');
+    const botResponseText = predefinedResponses[normalizedText] || "I'm specialized in NoteNetra's platform and products. For specific queries, please visit our documentation or contact support.";
 
-    const botResponseText = predefinedResponses[normalizedText] || "I can only answer questions related to NoteNetra's website and products in this chat. Please refine your question.";
-
-    // Simulate bot response (replace with actual Gemini API call or live agent integration)
     setTimeout(() => {
-      const botResponse = { id: messages.length + 2, text: botResponseText, sender: "bot" };
+      const botResponse = { id: Date.now() + 1, text: botResponseText, sender: "bot" };
       setMessages((prevMessages) => [...prevMessages, botResponse]);
-    }, 1000); // Simulate network delay
+    }, 1000);
   };
 
   const handleQuickOptionClick = (option) => {
     handleSendMessage(option);
   };
 
-  // The "View Full Chat" button and its associated logic have been removed as per user request.
-
   return (
-    <motion.div
-      className="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-3 md:bottom-8 md:right-8"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none md:bottom-8 md:right-8">
       {/* Greeting Bubble */}
       <AnimatePresence>
         {showGreetingBubble && !isChatPanelOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 10 }}
-            transition={{ duration: 0.3 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 max-w-xs"
+            initial={{ opacity: 0, scale: 0.8, x: 20 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.8, x: 20 }}
+            className="pointer-events-auto bg-white dark:bg-gray-900 border border-border/50 rounded-2xl shadow-2xl p-4 mb-4 max-w-[280px] relative overflow-hidden group"
           >
-            <p className="text-sm text-gray-800 dark:text-gray-200 mb-2">{catchyLine}</p>
+            {/* Progress bar decoration */}
+            <div className="absolute top-0 left-0 h-1 bg-primary w-0 group-hover:w-full transition-all duration-1000" />
+
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 p-1 overflow-hidden">
+                <img src={LOGO_CONFIG.imagePath} alt="Logo" className="w-full h-full object-contain" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-bold text-primary uppercase tracking-wider">NoteNetra AI</p>
+                <div className="flex items-center space-x-1">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                  <p className="text-[10px] text-muted-foreground font-medium">Online</p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-sm font-medium text-foreground mb-3 leading-relaxed">
+              {catchyLine}
+            </p>
+
             <button
               onClick={toggleChatPanel}
-              className="text-xs bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
+              className="w-full py-2 bg-primary hover:bg-primary/90 text-white text-xs font-bold rounded-xl transition-all duration-300 shadow-lg shadow-primary/20 flex items-center justify-center space-x-2"
             >
-              Start Chat
+              <span>Ask a question</span>
+              <Icon name="ArrowRight" size={14} />
             </button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Chat Panel */}
+      {/* Main Chat Panel */}
       <AnimatePresence>
         {isChatPanelOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            initial={{ opacity: 0, scale: 0.95, y: 20, transformOrigin: 'bottom right' }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-x-0 bottom-0 md:left-auto md:w-[400px] md:h-[500px] md:rounded-lg md:right-8 md:bottom-8 chat-panel shadow-xl flex flex-col overflow-hidden"
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="pointer-events-auto md:w-[420px] md:h-[600px] w-[calc(100vw-48px)] h-[calc(100vh-120px)] bg-white dark:bg-[#0c0c0e] border border-border/60 rounded-[2rem] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden mb-4 relative"
           >
-            {/* Header */}
-            <div className="flex justify-between items-center p-4 border-b chat-header">
-              <h3 className="text-lg font-semibold">Chat with an Expert</h3>
-              <button
-                onClick={toggleChatPanel}
-                className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-                aria-label="Close chat panel"
-              >
-                <Icon name="X" size={20} />
-              </button>
-            </div>
+            {/* Premium Header */}
+            <div className="relative p-6 bg-gradient-to-br from-primary/10 via-background to-background border-b border-border/40 overflow-hidden">
+              {/* Background Glow */}
+              <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl" />
 
-            {/* Message Area */}
-            <div 
-              ref={chatContainerRef}
-              className="flex-grow p-4 space-y-4 overflow-y-auto custom-scrollbar"
-            >
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex ${
-                    msg.sender === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
-                      msg.sender === "user"
-                        ? "chat-user-message rounded-br-none"
-                        : "chat-bot-message rounded-bl-none"
-                    }`}
-                  >
-                    <p className="text-sm font-medium">{msg.text}</p>
+              <div className="flex justify-between items-center relative z-10">
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <div className="w-12 h-12 rounded-2xl bg-white dark:bg-gray-800 shadow-md border border-border/50 p-2 overflow-hidden flex items-center justify-center group-hover:scale-105 transition-transform">
+                      <img src={LOGO_CONFIG.imagePath} alt="Logo" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full shadow-sm" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground">NoteNetra AI</h3>
+                    <p className="text-xs text-muted-foreground flex items-center">
+                      Business Expert • Responds instantly
+                    </p>
                   </div>
                 </div>
-              ))}
-              <div ref={messagesEndRef} /> {/* Scroll anchor */}
+
+                <button
+                  onClick={toggleChatPanel}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all border border-border/20"
+                >
+                  <Icon name="X" size={20} />
+                </button>
+              </div>
             </div>
 
-            {/* Quick Action Buttons */}
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-wrap gap-2">
-              {[ "What is NoteNetra", "How does the NoteNetra device work", "What features does NoteNetra offer", "How can NoteNetra help my business", "Where can I buy the NoteNetra device" , "order device" ].map(
-                (option) => (
-                  <button
-                    key={option}
-                    onClick={() => handleQuickOptionClick(option)}
-                    className="px-3 py-1 rounded-full text-xs chat-quick-button hover:opacity-80 transition-colors"
-                  >
-                    {option}
-                  </button>
-                )
-              )}
-            </div>
-
-            {/* Chat Input */}
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex space-x-2 bg-gray-50 dark:bg-gray-800">
-              <input
-                type="text"
-                placeholder="Type a message..."
-                className="flex-grow px-4 py-2 chat-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") handleSendMessage();
-                }}
-              />
-              <button
-                onClick={() => handleSendMessage()}
-                className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm hover:bg-primary/90 transition-colors"
+            {/* Content Area */}
+            <div className="flex-1 overflow-hidden flex flex-col">
+              {/* Messages Group */}
+              <div
+                ref={chatContainerRef}
+                className="flex-1 p-6 space-y-6 overflow-y-auto custom-scrollbar-premium bg-slate-50/30 dark:bg-transparent"
               >
-                <Icon name="Send" size={18} />
-              </button>
+                {messages.map((msg) => (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    key={msg.id}
+                    className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"} max-w-[85%]`}>
+                      <div
+                        className={`px-4 py-3 shadow-sm ${msg.sender === "user"
+                            ? "bg-primary text-white rounded-[1.25rem] rounded-tr-none font-medium"
+                            : "bg-white dark:bg-gray-800 border border-border/50 text-foreground rounded-[1.25rem] rounded-tl-none"
+                          }`}
+                      >
+                        <p className="text-sm leading-relaxed">{msg.text}</p>
+                      </div>
+                      <span className="text-[10px] text-muted-foreground mt-1.5 font-medium px-1">
+                        {msg.sender === "user" ? "You" : "NoteNetra Bot"} • {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Enhanced Quick Actions */}
+              <div className="px-6 py-4 bg-background border-t border-border/40 overflow-x-auto whitespace-nowrap scrollbar-hide">
+                <div className="flex space-x-2">
+                  {["What is NoteNetra", "Pricing", "Order Device", "Features"].map(
+                    (option) => (
+                      <button
+                        key={option}
+                        onClick={() => handleQuickOptionClick(option)}
+                        className="px-4 py-2 rounded-xl text-xs font-bold bg-muted/40 hover:bg-primary/10 hover:text-primary transition-all border border-border/40"
+                      >
+                        {option}
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Chat Input Area */}
+              <div className="p-6 bg-background">
+                <div className="relative flex items-center">
+                  <input
+                    type="text"
+                    placeholder="Type your message..."
+                    className="w-full pl-4 pr-12 py-3.5 bg-muted/30 border border-border/60 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground/60"
+                    value={inputMessage}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") handleSendMessage();
+                    }}
+                  />
+                  <button
+                    onClick={() => handleSendMessage()}
+                    disabled={!inputMessage.trim()}
+                    className="absolute right-2 w-10 h-10 flex items-center justify-center rounded-xl bg-primary text-white hover:opacity-90 transition-all disabled:opacity-30 disabled:grayscale"
+                  >
+                    <Icon name="Send" size={18} />
+                  </button>
+                </div>
+                <div className="flex justify-center mt-4">
+                  <p className="text-[10px] text-muted-foreground/50 font-medium">Powered by NoteNetra AI Engine</p>
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Floating Agent Icon and optional Greeting Bubble */}
-      <AnimatePresence>
-        {!isChatPanelOpen && !showGreetingBubble && (
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            onClick={toggleChatPanel}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            className="w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center"
-            aria-label="Open chat"
-          >
+      {/* Floating Trigger Button */}
+      {!isChatPanelOpen && (
+        <motion.button
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={toggleChatPanel}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="pointer-events-auto relative w-16 h-16 bg-primary rounded-[1.5rem] shadow-[0_12px_24px_-8px_rgba(8,145,178,0.5)] flex items-center justify-center transition-all group overflow-hidden"
+        >
+          {/* Internal Glow Effect */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+          <div className="relative z-10 text-white">
             <AnimatePresence mode="wait">
-              {isHovered ? (
-                <motion.div
-                  key="message"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Icon name="MessageCircle" size={24} />
+              {isChatPanelOpen ? (
+                <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
+                  <Icon name="X" size={28} strokeWidth={2.5} />
                 </motion.div>
               ) : (
-                <motion.div
-                  key="default"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Icon name="MessageCircle" size={24} />
+                <motion.div key="open" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }}>
+                  <Icon name="MessageCircle" size={28} strokeWidth={2.5} />
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.button>
-        )}
-      </AnimatePresence>
-    </motion.div>
+          </div>
+
+          {/* Notification Badge */}
+          {!isChatPanelOpen && (
+            <div className="absolute top-2 right-2 w-3.5 h-3.5 bg-red-500 border-2 border-primary rounded-full" />
+          )}
+        </motion.button>
+      )}
+    </div>
   );
 };
 
 export default ChatWidget;
+
