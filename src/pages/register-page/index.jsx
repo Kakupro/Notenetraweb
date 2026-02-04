@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
-import Logo from '../../components/ui/Logo';
+import CustomLogo from '../../components/ui/CustomLogo';
 import Icon from '../../components/AppIcon';
 
 const RegisterPage = () => {
@@ -14,7 +14,7 @@ const RegisterPage = () => {
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const navigate = useNavigate();
-  
+
   const { register, handleSubmit, formState: { errors }, watch, getValues } = useForm({
     defaultValues: {
       businessName: '',
@@ -49,13 +49,13 @@ const RegisterPage = () => {
 
   const getPasswordStrength = (password) => {
     if (!password) return { strength: 0, label: '', color: '' };
-    
+
     let strength = 0;
     if (password?.length >= 8) strength++;
     if (/[A-Z]/?.test(password)) strength++;
     if (/[0-9]/?.test(password)) strength++;
     if (/[^A-Za-z0-9]/?.test(password)) strength++;
-    
+
     const levels = [
       { strength: 0, label: 'Very Weak', color: 'text-error' },
       { strength: 1, label: 'Weak', color: 'text-warning' },
@@ -63,7 +63,7 @@ const RegisterPage = () => {
       { strength: 3, label: 'Good', color: 'text-primary' },
       { strength: 4, label: 'Strong', color: 'text-success' },
     ];
-    
+
     return levels?.[strength] || levels?.[0];
   };
 
@@ -79,13 +79,13 @@ const RegisterPage = () => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Registration attempt:', { 
-        ...data, 
-        acceptTerms, 
+      console.log('Registration attempt:', {
+        ...data,
+        acceptTerms,
         acceptPrivacy,
         timestamp: new Date()?.toISOString()
       });
-      
+
       // For now, redirect to login with success message
       navigate('/login-page?registered=true');
     } catch (error) {
@@ -113,9 +113,9 @@ const RegisterPage = () => {
     <>
       <Helmet>
         <title>Create Your NoteNetra Account - Join Thousands of Growing MSMEs</title>
-        <meta 
-          name="description" 
-          content="Join NoteNetra and transform your offline business into digital growth opportunities. Setup takes just 5 minutes with bank-grade security." 
+        <meta
+          name="description"
+          content="Join NoteNetra and transform your offline business into digital growth opportunities. Setup takes just 5 minutes with bank-grade security."
         />
         <meta name="keywords" content="NoteNetra signup, register, create account, MSME registration, business growth" />
         <link rel="canonical" href="/register-page" />
@@ -125,7 +125,7 @@ const RegisterPage = () => {
         {/* Header with Logo */}
         <header className="w-full py-6 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
-            <Logo />
+            <CustomLogo />
           </div>
         </header>
 
@@ -154,10 +154,10 @@ const RegisterPage = () => {
               >
                 <div className="flex items-center space-x-3">
                   <svg width="18" height="18" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                   </svg>
                   <span>Continue with Google</span>
                 </div>
@@ -282,12 +282,11 @@ const RegisterPage = () => {
                     <div className="flex items-center space-x-2">
                       <div className="flex-1 bg-muted rounded-full h-1">
                         <div
-                          className={`h-1 rounded-full transition-all ${
-                            passwordStrength?.strength === 1 ? 'bg-error w-1/4' :
-                            passwordStrength?.strength === 2 ? 'bg-warning w-2/4' :
-                            passwordStrength?.strength === 3 ? 'bg-primary w-3/4' :
-                            passwordStrength?.strength === 4 ? 'bg-success w-full': 'bg-error w-1/4'
-                          }`}
+                          className={`h-1 rounded-full transition-all ${passwordStrength?.strength === 1 ? 'bg-error w-1/4' :
+                              passwordStrength?.strength === 2 ? 'bg-warning w-2/4' :
+                                passwordStrength?.strength === 3 ? 'bg-primary w-3/4' :
+                                  passwordStrength?.strength === 4 ? 'bg-success w-full' : 'bg-error w-1/4'
+                            }`}
                         />
                       </div>
                       <span className={`text-xs ${passwordStrength?.color}`}>
@@ -394,8 +393,8 @@ const RegisterPage = () => {
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">
                   Already have an account?{' '}
-                  <Link 
-                    to="/login-page" 
+                  <Link
+                    to="/login-page"
                     className="text-primary hover:text-primary/80 font-medium transition-colors"
                   >
                     Login here

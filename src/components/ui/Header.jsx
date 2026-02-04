@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Icon from '../AppIcon';
 import Button from './Button';
-import Logo from './Logo';
 import CustomLogo from './CustomLogo';
 
 
