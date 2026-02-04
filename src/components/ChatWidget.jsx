@@ -117,18 +117,18 @@ const ChatWidget = ({ catchyLine = "Smart insights for your business", agentImag
             {/* Premium Header with Cover Image */}
             <div className="relative border-b border-border/40 overflow-hidden">
               {/* Cover Image Banner */}
-              <div className="h-32 w-full relative overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5">
+              <div className="h-32 w-full relative overflow-hidden bg-white">
                 <img
                   src={LOGO_CONFIG.imagePath}
                   alt="Cover"
-                  className="w-full h-full object-cover blur-[2px] opacity-40 transform scale-110"
+                  className="w-full h-full object-cover opacity-90 transform scale-100"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
 
                 {/* Close Button on top of cover */}
                 <button
                   onClick={toggleChatPanel}
-                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg bg-black/20 hover:bg-black/40 text-white backdrop-blur-md transition-all z-20"
+                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg bg-black/40 hover:bg-black/60 text-white backdrop-blur-md transition-all z-20"
                 >
                   <Icon name="X" size={18} />
                 </button>
@@ -136,16 +136,16 @@ const ChatWidget = ({ catchyLine = "Smart insights for your business", agentImag
 
               <div className="px-6 pb-6 -mt-10 relative z-10 flex items-end space-x-4">
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-2xl bg-white dark:bg-gray-800 shadow-xl border-4 border-white dark:border-gray-900 p-2 overflow-hidden flex items-center justify-center">
+                  <div className="w-20 h-20 rounded-2xl bg-white dark:bg-gray-800 shadow-2xl border-4 border-white dark:border-gray-900 p-2 overflow-hidden flex items-center justify-center">
                     <img src={LOGO_CONFIG.imagePath} alt="Logo" className="w-full h-full object-contain" />
                   </div>
                   <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-4 border-white dark:border-gray-900 rounded-full shadow-md" />
                 </div>
                 <div className="mb-2">
-                  <h3 className="text-xl font-bold text-foreground tracking-tight leading-none mb-1">NoteNetra AI</h3>
+                  <h3 className="text-xl font-bold text-foreground tracking-tight leading-none mb-1 shadow-sm">NoteNetra AI</h3>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    <p className="text-xs text-muted-foreground font-semibold">Active Support</p>
+                    <p className="text-xs text-muted-foreground font-semibold">Ready to assist</p>
                   </div>
                 </div>
               </div>
@@ -168,8 +168,8 @@ const ChatWidget = ({ catchyLine = "Smart insights for your business", agentImag
                     <div className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"} max-w-[85%]`}>
                       <div
                         className={`px-4 py-3 shadow-sm ${msg.sender === "user"
-                          ? "bg-primary text-white rounded-[1.25rem] rounded-tr-none font-medium"
-                          : "bg-white dark:bg-gray-800 border border-border/50 text-foreground rounded-[1.25rem] rounded-tl-none"
+                            ? "bg-primary text-white rounded-[1.25rem] rounded-tr-none font-medium"
+                            : "bg-white dark:bg-gray-800 border border-border/50 text-foreground rounded-[1.25rem] rounded-tl-none"
                           }`}
                       >
                         <p className="text-sm leading-relaxed">{msg.text}</p>
@@ -238,20 +238,20 @@ const ChatWidget = ({ catchyLine = "Smart insights for your business", agentImag
           onClick={toggleChatPanel}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="pointer-events-auto relative w-16 h-16 bg-primary rounded-[1.5rem] shadow-[0_12px_24px_-8px_rgba(8,145,178,0.5)] flex items-center justify-center transition-all group overflow-hidden"
+          className="pointer-events-auto relative w-16 h-16 bg-white dark:bg-gray-800 rounded-[1.5rem] shadow-[0_12px_24px_-8px_rgba(0,0,0,0.3)] flex items-center justify-center transition-all group overflow-hidden border-2 border-primary/20"
         >
           {/* Internal Glow Effect */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-          <div className="relative z-10 text-white">
+          <div className="relative z-10 w-full h-full flex items-center justify-center">
             <AnimatePresence mode="wait">
               {isChatPanelOpen ? (
                 <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
-                  <Icon name="X" size={28} strokeWidth={2.5} />
+                  <Icon name="X" size={28} strokeWidth={2.5} className="text-primary" />
                 </motion.div>
               ) : (
-                <motion.div key="open" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }}>
-                  <Icon name="MessageCircle" size={28} strokeWidth={2.5} />
+                <motion.div key="open" initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.5, opacity: 0 }} className="w-full h-full p-3 flex items-center justify-center">
+                  <img src={LOGO_CONFIG.imagePath} alt="Logo" className="w-full h-full object-contain" />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -259,7 +259,7 @@ const ChatWidget = ({ catchyLine = "Smart insights for your business", agentImag
 
           {/* Notification Badge */}
           {!isChatPanelOpen && (
-            <div className="absolute top-2 right-2 w-3.5 h-3.5 bg-red-500 border-2 border-primary rounded-full" />
+            <div className="absolute top-3 right-3 w-3 h-3 bg-red-500 border-2 border-white dark:border-gray-800 rounded-full" />
           )}
         </motion.button>
       )}
