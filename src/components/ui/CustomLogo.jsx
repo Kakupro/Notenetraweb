@@ -4,29 +4,29 @@ import { LOGO_CONFIG } from '../../utils/logoConfig';
 
 const CustomLogo = ({ variant = 'default', className = '', showText = true, design = 'custom' }) => {
   const config = { ...LOGO_CONFIG, showText: showText !== undefined ? showText : LOGO_CONFIG.variants[variant]?.showText ?? true };
-  
+
   // Different logo designs
   const logoDesigns = {
     modern: {
       icon: (
         <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
-            <path 
-              d="M12 2L2 7L12 12L22 7L12 2Z" 
-              fill="currentColor" 
-              stroke="currentColor" 
+            <path
+              d="M12 2L2 7L12 12L22 7L12 2Z"
+              fill="currentColor"
+              stroke="currentColor"
               strokeWidth="0.5"
             />
-            <path 
-              d="M2 17L12 22L22 17" 
-              fill="none" 
-              stroke="currentColor" 
+            <path
+              d="M2 17L12 22L22 17"
+              fill="none"
+              stroke="currentColor"
               strokeWidth="2"
             />
-            <path 
-              d="M2 12L12 17L22 12" 
-              fill="none" 
-              stroke="currentColor" 
+            <path
+              d="M2 12L12 17L22 12"
+              fill="none"
+              stroke="currentColor"
               strokeWidth="2"
             />
           </svg>
@@ -34,49 +34,49 @@ const CustomLogo = ({ variant = 'default', className = '', showText = true, desi
       ),
       accent: "bg-yellow-400"
     },
-    
+
     tech: {
       icon: (
         <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center shadow-md transition-all duration-300 group-hover:scale-105 group-hover:rotate-3">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
-            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2"/>
-            <path d="M8 12L11 15L16 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
+            <path d="M8 12L11 15L16 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="12" cy="12" r="3" fill="currentColor" />
           </svg>
         </div>
       ),
       accent: "bg-red-400"
     },
-    
+
     finance: {
       icon: (
         <div className="w-8 h-8 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
-            <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
-            <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="2"/>
+            <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor" />
+            <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="2" />
           </svg>
         </div>
       ),
       accent: "bg-orange-400"
     },
-    
+
     minimal: {
       icon: (
         <div className="w-8 h-8 bg-gradient-to-br from-slate-800 to-slate-600 rounded-md flex items-center justify-center shadow-md transition-all duration-300 group-hover:scale-105">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
-            <path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
         </div>
       ),
       accent: "bg-blue-400"
     },
-    
+
     custom: {
       icon: (
         <div className={`${config.size.width} ${config.size.height} rounded-lg flex items-center justify-center shadow-md transition-all duration-300 group-hover:scale-105 overflow-hidden`}>
-          <img 
-            src={config.imagePath} 
-            alt={config.altText} 
+          <img
+            src={config.imagePath}
+            alt={config.altText}
             className="w-full h-full object-contain"
             onError={(e) => {
               // Fallback to default logo if custom logo fails to load
@@ -112,10 +112,10 @@ const CustomLogo = ({ variant = 'default', className = '', showText = true, desi
       <LogoIcon />
       {config.showText && (
         <div className="flex flex-col">
-          <span className="text-xl font-bold text-dark-text-primary tracking-tight">
+          <span className="text-xl font-bold text-foreground tracking-tight">
             {config.companyName}
           </span>
-          <span className="text-xs text-dark-text-muted -mt-1 font-medium">
+          <span className="text-xs text-muted-foreground -mt-1 font-medium">
             {config.tagline}
           </span>
         </div>

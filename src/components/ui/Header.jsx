@@ -97,7 +97,6 @@ const Header = () => {
                   {item?.label}
                   {isActivePath(item?.path) && (
                     <motion.div
-                      layoutId="activeNav"
                       className="absolute bottom-1 left-4 right-4 h-0.5 bg-primary rounded-full shadow-[0_0_10px_rgba(8,145,178,0.5)]"
                     />
                   )}

@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Icon from '../../../components/AppIcon';
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import { app } from '../../../firebase';
+import { functions } from '../../../firebase';
+import { httpsCallable } from 'firebase/functions';
 import Button from '../../../components/ui/Button';
 
 const FeaturesShowcase = () => {
@@ -17,7 +17,6 @@ const FeaturesShowcase = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const functions = getFunctions(app);
   const calculateScore = httpsCallable(functions, 'calculateCreditScore');
 
   const handleCalculateCreditScore = async () => {

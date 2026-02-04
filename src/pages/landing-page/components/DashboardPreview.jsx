@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
+import Button from '../../../components/ui/Button';
 
 const DashboardPreview = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -99,8 +100,8 @@ const DashboardPreview = () => {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 capitalize ${activeTab === tab
-                    ? 'bg-background text-primary shadow-lg border border-border/50'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  ? 'bg-background text-primary shadow-lg border border-border/50'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   }`}
               >
                 {tab}

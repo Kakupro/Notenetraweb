@@ -234,3 +234,46 @@ input:focus, textarea:focus, select:focus {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
 }
+
+/* Custom Animations */
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-gradient {
+  animation: gradient 6s linear infinite;
+  background-size: 200% auto;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+:root {
+  --navigation: 100;
+  --mobile-menu: 200;
+}
+
+.z-navigation {
+  z-index: var(--navigation);
+}
+
+.z-mobile-menu {
+  z-index: var(--mobile-menu);
+}
