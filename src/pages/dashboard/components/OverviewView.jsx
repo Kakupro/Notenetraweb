@@ -28,13 +28,13 @@ const OverviewView = ({ children }) => {
         const data = snapshot.val();
         if (data) {
           const transactions = Object.values(data).filter(t => t && t.time);
-          
+
           // Calculate KPIs from ESP32 data
           const totalRevenue = transactions.filter(t => t.type === 'credit').reduce((acc, t) => acc + (t.amount || 0), 0);
           const totalDebits = transactions.filter(t => t.type === 'debit').reduce((acc, t) => acc + (t.amount || 0), 0);
           const totalTransactions = transactions.length;
           const currentBalance = totalRevenue - totalDebits;
-          
+
           // Compute real-time credit score from cash transactions
           const computed = computeCreditScoreFromTransactions(
             transactions.map(t => ({
@@ -55,10 +55,23 @@ const OverviewView = ({ children }) => {
           // Process revenue data for chart
           const monthlyRevenue = transactions.reduce((acc, t) => {
             if (t.time) {
-              const date = new Date(t.time.replace(/(\d{2})-(\d{2})-(\d{4})/, '$3-$2-$1'));
-              const month = date.toLocaleString('default', { month: 'short' });
-              if (t.type === 'credit') {
-                acc[month] = (acc[month] || 0) + (t.amount || 0);
+              let date;
+              if (typeof t.time === 'string') {
+                // Try parsing DD-MM-YYYY or ISO string
+                if (t.time.match(/^\d{2}-\d{2}-\d{4}/)) {
+                  date = new Date(t.time.replace(/(\d{2})-(\d{2})-(\d{4})/, '$3-$2-$1'));
+                } else {
+                  date = new Date(t.time);
+                }
+              } else if (typeof t.time === 'number') {
+                date = new Date(t.time);
+              }
+
+              if (date && !isNaN(date.getTime())) {
+                const month = date.toLocaleString('default', { month: 'short' });
+                if (t.type === 'credit') {
+                  acc[month] = (acc[month] || 0) + (t.amount || 0);
+                }
               }
             }
             return acc;
@@ -73,9 +86,16 @@ const OverviewView = ({ children }) => {
           // Set recent transactions (last 5)
           const recent = transactions
             .sort((a, b) => {
-              const dateA = new Date(a.time.replace(/(\d{2})-(\d{2})-(\d{4})/, '$3-$2-$1'));
-              const dateB = new Date(b.time.replace(/(\d{2})-(\d{2})-(\d{4})/, '$3-$2-$1'));
-              return dateB - dateA;
+              const getTime = (time) => {
+                if (typeof time === 'string') {
+                  if (time.match(/^\d{2}-\d{2}-\d{4}/)) {
+                    return new Date(time.replace(/(\d{2})-(\d{2})-(\d{4})/, '$3-$2-$1')).getTime();
+                  }
+                  return new Date(time).getTime();
+                }
+                return new Date(time).getTime();
+              }
+              return getTime(b.time) - getTime(a.time);
             })
             .slice(0, 5)
             .map(t => ({
@@ -99,7 +119,7 @@ const OverviewView = ({ children }) => {
 
   return (
     <div className="p-6 space-y-6">
-      {children} 
+      {children}
       <div className="mb-6">
         <Button
           onClick={() => window.open('https://razorpay.me/@notenetra', '_blank')}
@@ -108,7 +128,7 @@ const OverviewView = ({ children }) => {
           Accept Online Payments (via Razorpay)
         </Button>
       </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpiData?.map((kpi, index) => (
           <div
             key={index}
@@ -139,7 +159,7 @@ const OverviewView = ({ children }) => {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis dataKey="month" stroke="var(--muted-foreground)" />
                 <YAxis stroke="var(--muted-foreground)" />
-                <Tooltip 
+                <Tooltip
                   formatter={(value) => [`₹${value?.toLocaleString('en-IN')}`, 'Revenue']}
                   labelStyle={{ color: 'var(--foreground)' }}
                   contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
@@ -153,20 +173,36 @@ const OverviewView = ({ children }) => {
         <div className="bg-card rounded-xl border border-border p-6">
           <h3 className="text-lg font-semibold text-foreground mb-6">Recent Transactions</h3>
           <div className="space-y-4">
-            {recentTransactions.map((tx, index) => (
-              <React.Fragment key={index}>
-                <div className="flex items-center justify-between">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-${tx.type === 'credit' ? 'green' : 'red'}-500`}>
-                      <Icon name={tx.type === 'credit' ? 'TrendingUp' : 'TrendingDown'} size={20} className={`text-${tx.type === 'credit' ? 'green' : 'red'}-400`} />
+            {recentTransactions.map((tx, index) => {
+              let displayDate = 'Invalid Date';
+              try {
+                // Ensure date is valid for display
+                const date = new Date(tx.time); // tx.time was preserved as original in map
+                // But we need to handle the specific format if it's that string
+                if (typeof tx.time === 'string' && tx.time.match(/^\d{2}-\d{2}-\d{4}/)) {
+                  displayDate = new Date(tx.time.replace(/(\d{2})-(\d{2})-(\d{4})/, '$3-$2-$1')).toLocaleDateString();
+                } else if (!isNaN(date.getTime())) {
+                  displayDate = date.toLocaleDateString();
+                }
+              } catch (e) { console.error('Date error', e) }
+
+              return (
+                <React.Fragment key={index}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-${tx.type === 'credit' ? 'green' : 'red'}-500/10`}>
+                        <Icon name={tx.type === 'credit' ? 'TrendingUp' : 'TrendingDown'} size={20} className={tx.type === 'credit' ? 'text-green-500' : 'text-red-500'} />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">{tx.mode || 'Cash'}</p>
+                        <p className="text-sm text-muted-foreground">{displayDate}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-foreground">{tx.mode}</p>
-                      <p className="text-sm text-muted-foreground">{new Date(tx.time).toLocaleDateString()}</p>
-                    </div>
+                    <p className={`font-semibold ${tx.type === 'credit' ? 'text-green-500' : 'text-red-500'}`}>₹{(tx.amount || 0).toLocaleString('en-IN')}</p>
                   </div>
-                  <p className={`font-semibold ${tx.type === 'credit' ? 'text-green-400' : 'text-red-400'}`}>₹{tx.amount.toLocaleString('en-IN')}</p>
                 </React.Fragment>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>
@@ -179,15 +215,15 @@ const OverviewView = ({ children }) => {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis dataKey="date" stroke="var(--muted-foreground)" />
                 <YAxis domain={['dataMin - 50', 'dataMax + 50']} stroke="var(--muted-foreground)" />
-                <Tooltip 
+                <Tooltip
                   formatter={(value) => [value, 'Credit Score']}
                   labelStyle={{ color: 'var(--foreground)' }}
                   contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="score" 
-                  stroke="var(--primary)" 
+                <Line
+                  type="monotone"
+                  dataKey="score"
+                  stroke="var(--primary)"
                   strokeWidth={3}
                   dot={{ fill: 'var(--primary)', strokeWidth: 2, r: 6 }}
                   activeDot={{ r: 8, fill: 'var(--primary)' }}
@@ -214,7 +250,7 @@ const OverviewView = ({ children }) => {
                     <Cell key={`cell-${index}`} fill={entry?.color} />
                   ))}
                 </Pie>
-                <Tooltip 
+                <Tooltip
                   formatter={(value) => [`${value.toFixed(2)}%`, 'Share']}
                   contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
                 />
