@@ -75,8 +75,8 @@ const ChatWidget = ({ catchyLine = "Smart insights for your business", agentImag
             className="pointer-events-auto bg-[#1a1c24] border border-white/10 rounded-[1.5rem] shadow-[0_20px_40px_rgba(0,0,0,0.4)] p-5 mb-4 max-w-[320px] transition-all duration-300"
           >
             <div className="flex items-center space-x-4 mb-4">
-              <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center border border-white/10 p-2 shrink-0">
-                <img src={LOGO_CONFIG.imagePath} alt="Logo" className="w-full h-full object-contain" />
+              <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center border border-white/10 overflow-hidden shrink-0">
+                <img src={LOGO_CONFIG.imagePath} alt="Logo" className="w-full h-full object-cover" />
               </div>
               <div className="flex-1">
                 <p className="text-xs font-bold text-primary uppercase tracking-[0.1em] mb-0.5">NoteNetra AI</p>
@@ -130,8 +130,8 @@ const ChatWidget = ({ catchyLine = "Smart insights for your business", agentImag
 
               <div className="px-8 pb-6 -mt-12 relative z-10 flex items-end space-x-5">
                 <div className="relative">
-                  <div className="w-24 h-24 rounded-[2rem] bg-[#1a1c24] shadow-2xl border-4 border-[#0c0c0e] p-4 overflow-hidden flex items-center justify-center">
-                    <img src={LOGO_CONFIG.imagePath} alt="Logo" className="w-full h-full object-contain scale-125" />
+                  <div className="w-24 h-24 rounded-[2rem] bg-[#1a1c24] shadow-2xl border-4 border-[#0c0c0e] overflow-hidden flex items-center justify-center">
+                    <img src={LOGO_CONFIG.imagePath} alt="Logo" className="w-full h-full object-cover" />
                   </div>
                   <div className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 border-4 border-[#0c0c0e] rounded-full shadow-lg" />
                 </div>
@@ -161,8 +161,8 @@ const ChatWidget = ({ catchyLine = "Smart insights for your business", agentImag
                     <div className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"} max-w-[85%]`}>
                       <div
                         className={`px-5 py-3.5 shadow-sm ${msg.sender === "user"
-                            ? "bg-primary text-white rounded-[1.5rem] rounded-tr-none font-medium"
-                            : "bg-white dark:bg-[#1a1c24] border border-border/50 text-foreground rounded-[1.5rem] rounded-tl-none font-medium"
+                          ? "bg-primary text-white rounded-[1.5rem] rounded-tr-none font-medium"
+                          : "bg-white dark:bg-[#1a1c24] border border-border/50 text-foreground rounded-[1.5rem] rounded-tl-none font-medium"
                           }`}
                       >
                         <p className="text-[14.5px] leading-relaxed">{msg.text}</p>
@@ -234,11 +234,11 @@ const ChatWidget = ({ catchyLine = "Smart insights for your business", agentImag
           {/* Progress ring/glow */}
           <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-          <div className="relative z-10 w-full h-full p-3.5 flex items-center justify-center">
+          <div className="relative z-10 w-full h-full p-0 flex items-center justify-center">
             <img
               src={LOGO_CONFIG.imagePath}
               alt="Logo"
-              className="w-full h-full object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.1)]"
+              className="w-full h-full object-cover drop-shadow-[0_0_10px_rgba(255,255,255,0.1)]"
             />
           </div>
 
