@@ -46,7 +46,7 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto content-spacing py-12 lg:py-24">
+      <div className="relative z-10 max-w-7xl mx-auto content-spacing pt-6 lg:pt-10 pb-12 lg:pb-24">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Content */}
           <motion.div

@@ -224,7 +224,7 @@ const Header = () => {
         </div>
       )}
       {/* Spacer for fixed header */}
-      <div className="h-20" />
+      <div className="h-16" />
     </>
   );
 };
