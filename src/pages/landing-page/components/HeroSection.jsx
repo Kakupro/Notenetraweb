@@ -239,22 +239,7 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Modern Scroll Indicator */}
-      <motion.div
-        animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center space-y-3 opacity-50 hover:opacity-100 transition-opacity cursor-pointer px-4 pt-10"
-        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-      >
-        <div className="w-6 h-10 border-2 border-foreground/20 rounded-full flex justify-center p-1.5 pt-1">
-          <motion.div
-            animate={{ height: [4, 12, 4], opacity: [1, 0.5, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-1 bg-primary rounded-full"
-          />
-        </div>
-        <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/50">Scroll to Explore</span>
-      </motion.div>
+
     </section>
   );
 };
