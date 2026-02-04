@@ -114,33 +114,40 @@ const ChatWidget = ({ catchyLine = "Smart insights for your business", agentImag
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className="pointer-events-auto md:w-[420px] md:h-[600px] w-[calc(100vw-48px)] h-[calc(100vh-120px)] bg-white dark:bg-[#0c0c0e] border border-border/60 rounded-[2rem] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden mb-4 relative"
           >
-            {/* Premium Header */}
-            <div className="relative p-6 bg-gradient-to-br from-primary/10 via-background to-background border-b border-border/40 overflow-hidden">
-              {/* Background Glow */}
-              <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl" />
+            {/* Premium Header with Cover Image */}
+            <div className="relative border-b border-border/40 overflow-hidden">
+              {/* Cover Image Banner */}
+              <div className="h-32 w-full relative overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5">
+                <img
+                  src={LOGO_CONFIG.imagePath}
+                  alt="Cover"
+                  className="w-full h-full object-cover blur-[2px] opacity-40 transform scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
-              <div className="flex justify-between items-center relative z-10">
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <div className="w-12 h-12 rounded-2xl bg-white dark:bg-gray-800 shadow-md border border-border/50 p-2 overflow-hidden flex items-center justify-center group-hover:scale-105 transition-transform">
-                      <img src={LOGO_CONFIG.imagePath} alt="Logo" className="w-full h-full object-contain" />
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-gray-900 rounded-full shadow-sm" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-foreground">NoteNetra AI</h3>
-                    <p className="text-xs text-muted-foreground flex items-center">
-                      Business Expert • Responds instantly
-                    </p>
-                  </div>
-                </div>
-
+                {/* Close Button on top of cover */}
                 <button
                   onClick={toggleChatPanel}
-                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-muted/30 text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all border border-border/20"
+                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg bg-black/20 hover:bg-black/40 text-white backdrop-blur-md transition-all z-20"
                 >
-                  <Icon name="X" size={20} />
+                  <Icon name="X" size={18} />
                 </button>
+              </div>
+
+              <div className="px-6 pb-6 -mt-10 relative z-10 flex items-end space-x-4">
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-2xl bg-white dark:bg-gray-800 shadow-xl border-4 border-white dark:border-gray-900 p-2 overflow-hidden flex items-center justify-center">
+                    <img src={LOGO_CONFIG.imagePath} alt="Logo" className="w-full h-full object-contain" />
+                  </div>
+                  <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-4 border-white dark:border-gray-900 rounded-full shadow-md" />
+                </div>
+                <div className="mb-2">
+                  <h3 className="text-xl font-bold text-foreground tracking-tight leading-none mb-1">NoteNetra AI</h3>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    <p className="text-xs text-muted-foreground font-semibold">Active Support</p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -161,8 +168,8 @@ const ChatWidget = ({ catchyLine = "Smart insights for your business", agentImag
                     <div className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"} max-w-[85%]`}>
                       <div
                         className={`px-4 py-3 shadow-sm ${msg.sender === "user"
-                            ? "bg-primary text-white rounded-[1.25rem] rounded-tr-none font-medium"
-                            : "bg-white dark:bg-gray-800 border border-border/50 text-foreground rounded-[1.25rem] rounded-tl-none"
+                          ? "bg-primary text-white rounded-[1.25rem] rounded-tr-none font-medium"
+                          : "bg-white dark:bg-gray-800 border border-border/50 text-foreground rounded-[1.25rem] rounded-tl-none"
                           }`}
                       >
                         <p className="text-sm leading-relaxed">{msg.text}</p>
