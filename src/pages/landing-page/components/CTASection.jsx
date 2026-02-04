@@ -1,28 +1,18 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
 const CTASection = () => {
   const [hoveredButton, setHoveredButton] = useState(null);
+  const navigate = useNavigate();
 
   const benefits = [
-    {
-      icon: 'Zap',
-      text: 'Setup in 5 minutes'
-    },
-    {
-      icon: 'Shield',
-      text: 'Bank-grade security'
-    },
-    {
-      icon: 'Users',
-      text: '24/7 support'
-    },
-    {
-      icon: 'TrendingUp',
-      text: 'Instant ROI tracking'
-    }
+    { icon: 'Zap', text: '5-Minute Setup' },
+    { icon: 'Shield', text: 'Bank-Grade Security' },
+    { icon: 'Users', text: '24/7 Support' },
+    { icon: 'TrendingUp', text: 'Instant Insights' }
   ];
 
   const testimonials = [
@@ -30,242 +20,161 @@ const CTASection = () => {
       name: 'Rajesh Kumar',
       business: 'Kumar Electronics',
       rating: 5,
-      text: `NoteNetra transformed my small electronics shop. Within 3 months, I got approved for a ₹3 lakh business loan based on my transaction history.`
+      text: "NoteNetra transformed my electronics shop. I got approved for a ₹3L loan within 3 months thanks to my digital records."
     },
     {
       name: 'Priya Sharma',
       business: 'Sharma Textiles',
       rating: 5,
-      text: `The device is so easy to use. My credit score improved from 650 to 780 in just 6 months. Now banks approach me for loans!`
+      text: "The device is seamless. My credit score jumped 130 points in 6 months. Banks are now reaching out to me!"
     },
     {
       name: 'Amit Patel',
       business: 'Patel General Store',
       rating: 5,
-      text: `Best investment for my business. The dashboard shows everything - sales, customers, inventory. Got ₹5 lakh loan approved in 24 hours.`
+      text: "Best investment for my store. The dashboard is intuitive and helped me secure a ₹5L loan in just 24 hours."
     }
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-primary/5 via-background to-accent/5 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-primary rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent rounded-full blur-3xl"></div>
+    <section className="py-24 bg-background relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute inset-0 pointer-events-none opacity-40">
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px]" />
       </div>
-      <div className="relative z-10 max-w-7xl mx-auto content-spacing">
-        {/* Main CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <div className="inline-flex items-center px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium border border-primary/20 mb-6">
-            <Icon name="Rocket" size={16} className="mr-2" />
-            Ready to Transform Your Business?
-          </div>
-          
-          <h2 className="text-4xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
-            Start Building Your
-            <span className="block text-primary">Credit History Today</span>
+
+      <div className="max-w-7xl mx-auto content-spacing relative z-10">
+        {/* Trust Header */}
+        <div className="text-center mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center px-4 py-2 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-wider mb-8"
+          >
+            <Icon name="Users" size={14} className="mr-2" />
+            Join 10,000+ MSMEs
+          </motion.div>
+
+          <h2 className="text-4xl lg:text-7xl font-bold text-foreground mb-8 cursor-default">
+            Trusted by Businesses
+            <span className="block text-primary italic">Across India</span>
           </h2>
-          
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8 leading-relaxed">
-            Join 10,000+ MSMEs who have already transformed their businesses with NoteNetra. 
-            Get your device delivered within 48 hours and start tracking transactions immediately.
-          </p>
 
-          {/* Benefits Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {benefits?.map((benefit, index) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+            {benefits.map((benefit, i) => (
               <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                key={i}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.1 }}
                 viewport={{ once: true }}
-                className="flex flex-col items-center space-y-2"
+                className="flex flex-col items-center space-y-3"
               >
-                <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
-                  <Icon name={benefit?.icon} size={20} />
+                <div className="w-14 h-14 bg-muted/50 text-primary rounded-2xl flex items-center justify-center border border-border/50 shadow-sm">
+                  <Icon name={benefit.icon} size={24} />
                 </div>
-                <span className="text-sm font-medium text-foreground">{benefit?.text}</span>
+                <span className="text-sm font-bold text-foreground">{benefit.text}</span>
               </motion.div>
             ))}
           </div>
+        </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+        {/* Testimonials Grid */}
+        <div className="grid md:grid-cols-3 gap-8 mb-24">
+          {testimonials.map((testimonial, i) => (
             <motion.div
-              onMouseEnter={() => setHoveredButton('order')}
-              onMouseLeave={() => setHoveredButton(null)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              key={i}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              viewport={{ once: true }}
+              className="bg-muted/10 p-8 rounded-[2rem] border border-border/50 hover:border-primary/20 transition-all duration-500 group"
             >
-              <Button
-                variant="default"
-                size="xl"
-                iconName="ShoppingCart"
-                iconPosition="left"
-                className="relative overflow-hidden group shadow-lg"
-                onClick={() => window.location.href = '/contact-page'}
-              >
-                <span className="relative z-10 text-lg font-semibold">Order NoteNetra Device</span>
-                <motion.div
-                  animate={{
-                    scale: hoveredButton === 'order' ? 1.1 : 1,
-                    opacity: hoveredButton === 'order' ? 0.2 : 0
-                  }}
-                  className="absolute inset-0 bg-gradient-to-r from-primary to-accent"
-                />
-              </Button>
-            </motion.div>
-
-            <motion.div
-              onMouseEnter={() => setHoveredButton('demo')}
-              onMouseLeave={() => setHoveredButton(null)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Button
-                variant="outline"
-                size="xl"
-                iconName="Play"
-                iconPosition="left"
-                className="group border-2 hover:border-primary hover:text-primary"
-                onClick={() => {
-                  // Open demo in new tab with proper error handling
-                  try {
-                    window.open('/dashboard-demo', '_blank');
-                  } catch (error) {
-                    console.error('Error opening demo:', error);
-                    // Fallback to same window
-                    window.location.href = '/dashboard-demo';
-                  }
-                }}
-              >
-                <span className="text-lg font-semibold">Try Live Demo</span>
-              </Button>
-            </motion.div>
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8 mt-8 text-sm text-muted-foreground">
-            <div className="flex items-center space-x-2">
-              <Icon name="Shield" size={16} className="text-success" />
-              <span>RBI Compliant</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Icon name="Award" size={16} className="text-primary" />
-              <span>ISO 27001 Certified</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Icon name="Users" size={16} className="text-secondary" />
-              <span>10,000+ Happy Customers</span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Testimonials */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="mb-16"
-        >
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-foreground mb-4">
-              Trusted by MSMEs Across India
-            </h3>
-            <p className="text-muted-foreground">
-              See how NoteNetra has helped businesses like yours grow and access credit
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials?.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-card rounded-2xl p-6 border border-border shadow-card hover:shadow-interactive transition-all duration-300"
-              >
-                <div className="flex items-center space-x-1 mb-4">
-                  {[...Array(testimonial?.rating)]?.map((_, i) => (
-                    <Icon key={i} name="Star" size={16} className="text-warning fill-current" />
-                  ))}
+              <div className="flex space-x-1 mb-6">
+                {[...Array(5)].map((_, star) => (
+                  <Icon key={star} name="Star" size={14} className="text-warning fill-current" />
+                ))}
+              </div>
+              <p className="text-lg text-foreground/80 leading-relaxed mb-8 italic">
+                "{testimonial.text}"
+              </p>
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center font-bold text-primary">
+                  {testimonial.name.charAt(0)}
                 </div>
-                
-                <p className="text-muted-foreground mb-4 leading-relaxed">
-                  "{testimonial?.text}"
-                </p>
-                
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-primary/10 text-primary rounded-full flex items-center justify-center font-bold">
-                    {testimonial?.name?.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground">{testimonial?.name}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial?.business}</p>
-                  </div>
+                <div>
+                  <p className="font-bold text-foreground">{testimonial.name}</p>
+                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">{testimonial.business}</p>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
 
-        {/* Final CTA */}
+        {/* Main CTA Card */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="bg-gradient-to-r from-primary to-accent rounded-3xl p-8 lg:p-12 text-center text-primary-foreground relative overflow-hidden"
+          className="relative bg-foreground rounded-[3rem] p-10 lg:p-20 overflow-hidden shadow-2xl"
         >
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-background rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-background rounded-full blur-3xl"></div>
-          </div>
+          {/* Accent Glow */}
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
 
-          <div className="relative z-10">
-            <h3 className="text-3xl lg:text-4xl font-bold mb-4">
-              Don't Wait. Your Competition Won't.
-            </h3>
-            <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-              Every day you delay is a day of lost credit history and missed loan opportunities. 
-              Start building your financial future today.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                variant="secondary"
-                size="lg"
-                iconName="Phone"
-                iconPosition="left"
-                className="bg-white text-primary hover:bg-muted-foreground/10"
-                onClick={() => window.location.href = 'tel:+919911940639'}
-              >
-                Call Now: +91 9911940639
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                iconName="MessageCircle"
-                iconPosition="left"
-                className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
-                onClick={() => window.location.href = '/contact-page'}
-              >
-                Get Free Consultation
-              </Button>
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
+            <div className="text-center lg:text-left lg:max-w-2xl">
+              <h3 className="text-3xl lg:text-5xl font-bold text-background mb-6">
+                Don't wait for growth.<br />
+                <span className="text-primary italic">Let's build it together.</span>
+              </h3>
+              <p className="text-xl text-background/60 mb-8 leading-relaxed">
+                Join our platform today and start building the digital credit profile your business deserves. Setup takes less than 5 minutes.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Button
+                  variant="default"
+                  size="xl"
+                  onClick={() => navigate('/contact-page')}
+                  className="bg-primary text-white font-bold h-16 px-10 rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all duration-300"
+                >
+                  Order Device
+                </Button>
+                <Button
+                  variant="outline"
+                  size="xl"
+                  onClick={() => navigate('/dashboard-demo')}
+                  className="border-background text-background font-bold h-16 px-10 rounded-2xl hover:bg-background hover:text-foreground transition-all duration-300"
+                >
+                  Explore Demo
+                </Button>
+              </div>
+            </div>
+
+            <div className="relative flex-shrink-0">
+              <div className="w-48 h-48 lg:w-64 lg:h-64 bg-background/5 rounded-full border border-background/10 flex items-center justify-center animate-pulse">
+                <Icon name="Rocket" size={80} className="text-primary" />
+              </div>
             </div>
           </div>
         </motion.div>
+
+        {/* Trust Badges */}
+        <div className="mt-16 flex flex-wrap justify-center items-center gap-8 lg:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+          <div className="flex items-center space-x-2 text-sm font-bold">
+            <Icon name="Shield" size={18} className="text-success" />
+            <span>RBI Compliant</span>
+          </div>
+          <div className="flex items-center space-x-2 text-sm font-bold">
+            <Icon name="Award" size={18} className="text-primary" />
+            <span>ISO 27001 Certified</span>
+          </div>
+          <div className="flex items-center space-x-2 text-sm font-bold">
+            <Icon name="Zap" size={18} className="text-warning" />
+            <span>Fast Setup</span>
+          </div>
+        </div>
       </div>
     </section>
   );

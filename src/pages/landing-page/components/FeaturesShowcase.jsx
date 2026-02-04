@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Icon from '../../../components/AppIcon';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { app } from '../../../firebase';
+import Button from '../../../components/ui/Button';
 
 const FeaturesShowcase = () => {
   const [hoveredFeature, setHoveredFeature] = useState(null);
@@ -20,6 +21,10 @@ const FeaturesShowcase = () => {
   const calculateScore = httpsCallable(functions, 'calculateCreditScore');
 
   const handleCalculateCreditScore = async () => {
+    if (!monthlyRevenue || !monthlyTransactions || !businessAge) {
+      setError('Please fill in all fields');
+      return;
+    }
     setLoading(true);
     setError(null);
     setCreditScore(null);
@@ -42,297 +47,197 @@ const FeaturesShowcase = () => {
     {
       id: 1,
       icon: 'Activity',
-      title: 'Smart Transaction Tracking',
-      description: 'Automatically capture and categorize every cash and UPI transaction with AI-powered recognition and real-time processing.',
-      color: 'from-primary to-blue-600',
+      title: 'Transaction Analytics',
+      description: 'Capture every sale with AI-powered recognition. Real-time processing for instant insights.',
+      color: 'primary',
       stats: '99.9% Accuracy'
     },
     {
       id: 2,
       icon: 'TrendingUp',
       title: 'Credit Score Engine',
-      description: 'Build creditworthiness through transaction history analysis and generate comprehensive financial profiles for loan applications.',
-      color: 'from-accent to-green-600',
-      stats: '40% Faster Approvals'
+      description: 'Build creditworthiness through analyzed history. Unlock formal bank loans faster.',
+      color: 'accent',
+      stats: '40% Faster Loans'
     },
     {
       id: 3,
       icon: 'FileText',
-      title: 'One-Click Invoicing',
-      description: 'Generate GST-compliant invoices instantly from transaction data with automated customer details and inventory management.',
-      color: 'from-warning to-orange-600',
+      title: 'Digital Invoicing',
+      description: 'Generate GST invoices instantly. Professional records for every transaction.',
+      color: 'success',
       stats: '80% Time Saved'
     },
     {
       id: 4,
       icon: 'Store',
-      title: 'ONDC Storefront',
-      description: 'Seamlessly integrate with Open Network for Digital Commerce to expand your reach and access new customer segments.',
-      color: 'from-purple-500 to-pink-600',
-      stats: '3x Market Reach'
+      title: 'Market Expansion',
+      description: 'Connect with ONDC and expand your reach to new digital customer segments.',
+      color: 'warning',
+      stats: '3x More Reach'
     }
   ];
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef?.current) {
-      observer?.observe(sectionRef?.current);
-    }
-
-    return () => observer?.disconnect();
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setIsVisible(true);
+    }, { threshold: 0.1 });
+    if (sectionRef?.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 }
-    }
-  };
-
   return (
-    <section ref={sectionRef} className="py-20 bg-muted/30">
-      <div className="max-w-7xl mx-auto content-spacing">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate={isVisible ? "visible" : "hidden"}
-          className="text-center mb-16"
-        >
-          <motion.div variants={itemVariants}>
-            <div className="inline-flex items-center px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium border border-primary/20 mb-4">
-              <Icon name="Zap" size={16} className="mr-2" />
-              Powerful Features
-            </div>
-            <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-4">
-              Everything You Need to
-              <span className="block text-primary">Grow Your Business</span>
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Our comprehensive platform transforms your offline transactions into actionable insights, credit opportunities, and business growth tools.
-            </p>
-          </motion.div>
-        </motion.div>
+    <section ref={sectionRef} className="py-24 bg-muted/10 relative overflow-hidden">
+      {/* Abstract Shapes */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
+        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px]" />
+        <div className="absolute top-[20%] -right-[10%] w-[30%] h-[30%] bg-accent/20 rounded-full blur-[120px]" />
+      </div>
 
-        {/* Credit Score Simulator Section */}
-        <motion.div
-          variants={itemVariants}
-          initial="hidden"
-          animate={isVisible ? "visible" : "hidden"}
-          className="mt-20 p-8 bg-card rounded-2xl border border-border shadow-lg max-w-2xl mx-auto"
-        >
-          <h3 className="text-2xl font-bold text-foreground mb-6 text-center">Credit Score Simulator</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div>
-              <label htmlFor="monthlyRevenue" className="block text-sm font-medium text-muted-foreground mb-2">Monthly Revenue (₹)</label>
-              <input
-                type="number"
-                id="monthlyRevenue"
-                className="w-full p-3 rounded-lg bg-background border border-border focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                placeholder="e.g., 500000"
-                value={monthlyRevenue}
-                onChange={(e) => setMonthlyRevenue(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="monthlyTransactions" className="block text-sm font-medium text-muted-foreground mb-2">Monthly Transactions</label>
-              <input
-                type="number"
-                id="monthlyTransactions"
-                className="w-full p-3 rounded-lg bg-background border border-border focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                placeholder="e.g., 500"
-                value={monthlyTransactions}
-                onChange={(e) => setMonthlyTransactions(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="businessAge" className="block text-sm font-medium text-muted-foreground mb-2">Business Age (Years)</label>
-              <input
-                type="number"
-                id="businessAge"
-                className="w-full p-3 rounded-lg bg-background border border-border focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                placeholder="e.g., 5"
-                value={businessAge}
-                onChange={(e) => setBusinessAge(e.target.value)}
-              />
-            </div>
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full px-8 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors shadow-lg flex items-center justify-center"
-            onClick={handleCalculateCreditScore}
-            disabled={loading}
+      <div className="max-w-7xl mx-auto content-spacing relative z-10">
+        <div className="text-center mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isVisible ? { opacity: 1, y: 0 } : {}}
+            className="inline-flex items-center px-4 py-2 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-wider mb-6"
           >
-            {loading ? (
-              <Icon name="Loader" size={20} className="animate-spin mr-2" />
-            ) : (
-              <Icon name="Calculator" size={20} className="mr-2" />
-            )}
-            {loading ? 'Calculating...' : 'Calculate Credit Score'}
-          </motion.button>
+            <Icon name="Zap" size={14} className="mr-2" />
+            Cutting-Edge Technology
+          </motion.div>
+          <h2 className="text-4xl lg:text-7xl font-bold text-foreground mb-8">
+            Powering the Future of
+            <span className="block text-primary italic">Indian MSMEs</span>
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            From smart transaction tracking to credit visibility, we provide the tools you need to grow in the digital economy.
+          </p>
+        </div>
 
-          {error && (
-            <div className="mt-4 text-red-500 text-center">
-              {error}
-            </div>
-          )}
-
-          {creditScore !== null && !loading && !error && (
+        {/* Feature Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-24">
+          {features.map((feature, i) => (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-8 text-center bg-primary/10 p-6 rounded-xl border border-primary/20"
-            >
-              <h4 className="text-xl font-bold text-primary mb-2">Your Estimated Credit Score:</h4>
-              <p className="text-5xl font-extrabold text-foreground leading-tight">
-                {creditScore}
-              </p>
-              <p className="text-muted-foreground mt-2">This is an estimated score based on your inputs.</p>
-            </motion.div>
-          )}
-        </motion.div>
-
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate={isVisible ? "visible" : "hidden"}
-          className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mt-16"
-        >
-          {features?.map((feature) => (
-            <motion.div
-              key={feature?.id}
-              variants={itemVariants}
-              className="group relative"
-              onMouseEnter={() => setHoveredFeature(feature?.id)}
+              key={feature.id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: i * 0.1, duration: 0.6 }}
+              onMouseEnter={() => setHoveredFeature(feature.id)}
               onMouseLeave={() => setHoveredFeature(null)}
+              className="group relative h-full"
             >
-              <div className="relative bg-card rounded-2xl p-8 h-full border border-border shadow-card hover:shadow-interactive transition-all duration-300 transform hover:-translate-y-2">
-                {/* 3D Icon Container */}
-                <div className="relative mb-6">
-                  <motion.div
-                    animate={{
-                      rotateY: hoveredFeature === feature?.id ? 360 : 0,
-                      scale: hoveredFeature === feature?.id ? 1.1 : 1
-                    }}
-                    transition={{ duration: 0.6 }}
-                    className={`w-16 h-16 rounded-xl bg-gradient-to-br ${feature?.color} flex items-center justify-center shadow-lg`}
-                  >
-                    <Icon 
-                      name={feature?.icon} 
-                      size={28} 
-                      color="white" 
-                      strokeWidth={2}
-                    />
-                  </motion.div>
-                  
-                  {/* Glow Effect */}
-                  <motion.div
-                    animate={{
-                      opacity: hoveredFeature === feature?.id ? 0.6 : 0,
-                      scale: hoveredFeature === feature?.id ? 1.2 : 1
-                    }}
-                    transition={{ duration: 0.3 }}
-                    className={`absolute inset-0 rounded-xl bg-gradient-to-br ${feature?.color} blur-xl -z-10`}
-                  />
+              <div className="h-full bg-background p-8 rounded-[2.5rem] border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 flex flex-col">
+                <div className={`w-16 h-16 rounded-2xl bg-${feature.color}/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500`}>
+                  <Icon name={feature.icon} size={28} className={`text-${feature.color}`} />
                 </div>
-
-                <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                  {feature?.title}
+                <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors">
+                  {feature.title}
                 </h3>
-                
-                <p className="text-muted-foreground mb-4 leading-relaxed">
-                  {feature?.description}
+                <p className="text-muted-foreground leading-relaxed mb-6 flex-grow">
+                  {feature.description}
                 </p>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
-                    {feature?.stats}
+                <div className="flex items-center justify-between mt-auto pt-6 border-t border-border/10">
+                  <span className={`text-xs font-bold uppercase tracking-wider text-${feature.color}`}>
+                    {feature.stats}
                   </span>
-                  
-                  <motion.div
-                    animate={{
-                      x: hoveredFeature === feature?.id ? 5 : 0
-                    }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Icon 
-                      name="ArrowRight" 
-                      size={20} 
-                      className="text-muted-foreground group-hover:text-primary transition-colors"
-                    />
-                  </motion.div>
+                  <div className="w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                    <Icon name="ArrowRight" size={16} />
+                  </div>
                 </div>
-
-                {/* Hover Border Effect */}
-                <motion.div
-                  animate={{
-                    opacity: hoveredFeature === feature?.id ? 1 : 0
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${feature?.color} opacity-10 -z-10`}
-                />
               </div>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
 
-        {/* Bottom CTA */}
+        {/* Credit Simulator Card */}
         <motion.div
-          variants={itemVariants}
-          initial="hidden"
-          animate={isVisible ? "visible" : "hidden"}
-          className="text-center mt-16"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={isVisible ? { opacity: 1, scale: 1 } : {}}
+          transition={{ delay: 0.4, duration: 0.8 }}
+          className="relative max-w-4xl mx-auto bg-foreground rounded-[3rem] p-8 lg:p-16 overflow-hidden shadow-2xl"
         >
-          <p className="text-muted-foreground mb-6">
-            Ready to transform your business with smart transaction tracking?
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-8 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors shadow-lg"
-              onClick={() => window.location.href = '/features-page'}
+          {/* Animated Glow */}
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
+
+          <div className="relative z-10">
+            <div className="text-center mb-12">
+              <h3 className="text-3xl lg:text-4xl font-bold text-background mb-4">Credit Score Simulator</h3>
+              <p className="text-background/60">See how your transaction history impacts your creditworthiness.</p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 mb-10">
+              {[
+                { label: 'Monthly Revenue', value: monthlyRevenue, set: setMonthlyRevenue, placeholder: '₹ 5,00,000' },
+                { label: 'Transactions', value: monthlyTransactions, set: setMonthlyTransactions, placeholder: '500+' },
+                { label: 'Business Age', value: businessAge, set: setBusinessAge, placeholder: 'Years' }
+              ].map((input, idx) => (
+                <div key={idx} className="space-y-2">
+                  <label className="text-xs font-bold text-background/40 uppercase tracking-widest pl-2">
+                    {input.label}
+                  </label>
+                  <input
+                    type="number"
+                    value={input.value}
+                    onChange={(e) => input.set(e.target.value)}
+                    placeholder={input.placeholder}
+                    className="w-full h-14 bg-background/5 border border-background/10 rounded-2xl px-6 text-background placeholder:text-background/20 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <Button
+              variant="default"
+              size="xl"
+              fullWidth
+              onClick={handleCalculateCreditScore}
+              disabled={loading}
+              className="bg-primary hover:bg-primary/90 text-white font-bold h-16 rounded-2xl shadow-xl shadow-primary/20"
             >
-              Explore All Features
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-8 py-3 border border-border text-foreground rounded-lg font-medium hover:bg-muted transition-colors"
-              onClick={() => {
-                // Open demo in new tab with proper error handling
-                try {
-                  window.open('/dashboard-demo', '_blank');
-                } catch (error) {
-                  console.error('Error opening demo:', error);
-                  // Fallback to same window
-                  window.location.href = '/dashboard-demo';
-                }
-              }}
-            >
-              View Live Demo
-            </motion.button>
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin mr-3" />
+                  Analyzing Data...
+                </div>
+              ) : (
+                <>
+                  <Icon name="Calculator" size={20} className="mr-3" />
+                  Calculate Estimated Score
+                </>
+              )}
+            </Button>
+
+            <AnimatePresence>
+              {error && (
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="mt-4 text-center text-destructive text-sm font-bold"
+                >
+                  {error}
+                </motion.p>
+              )}
+
+              {creditScore !== null && !loading && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-12 text-center p-10 bg-background/5 rounded-[2rem] border border-background/10 backdrop-blur-md"
+                >
+                  <p className="text-xs font-bold text-background/40 uppercase tracking-[0.2em] mb-4">Estimated Digital Credit Score</p>
+                  <div className="relative inline-block">
+                    <span className="text-7xl lg:text-9xl font-black text-primary drop-shadow-[0_0_20px_rgba(var(--primary-rgb),0.5)]">
+                      {creditScore}
+                    </span>
+                  </div>
+                  <p className="text-background/60 mt-6 max-w-md mx-auto italic">
+                    Based on your transaction volume and business age, you have a
+                    <span className="text-success font-bold px-1">Strong</span>
+                    financial profile.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </motion.div>
       </div>

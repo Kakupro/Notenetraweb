@@ -7,145 +7,117 @@ import DashboardPreview from './components/DashboardPreview';
 import WorkflowSection from './components/WorkflowSection';
 import CTASection from './components/CTASection';
 import ChatWidget from '../../components/ChatWidget';
+import CustomLogo from '../../components/ui/CustomLogo';
+import Icon from '../../components/AppIcon';
 
 const LandingPage = () => {
   useEffect(() => {
-    // Scroll to top on page load
     window.scrollTo(0, 0);
   }, []);
 
   return (
     <>
       <Helmet>
-        <title>NoteNetra - Transform Your Offline Business Into Digital Growth</title>
-        <meta 
-          name="description" 
-          content="NoteNetra's smart IIoT platform converts cash and UPI transactions into business insights, credit visibility, and loan eligibility for MSMEs across India. Setup in 5 minutes, bank-grade security, 24/7 support." 
+        <title>NoteNetra | Next-Gen IIoT Platform for MSMEs</title>
+        <meta
+          name="description"
+          content="Transform your offline business into digital growth. NoteNetra captures cash and UPI transactions to build your digital credit profile and unlock bank loans."
         />
-        <meta name="keywords" content="MSME, business growth, credit score, loan eligibility, transaction tracking, IIoT platform, digital transformation, India" />
-        <meta property="og:title" content="NoteNetra - Smart IIoT Platform for MSMEs" />
-        <meta property="og:description" content="Transform your offline business into digital growth opportunities with NoteNetra's plug-and-play device." />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
         <link rel="canonical" href="/landing-page" />
       </Helmet>
-      <div className="min-h-screen dark bg-background text-foreground">
+
+      <div className="min-h-screen bg-background text-foreground selection:bg-primary/30 selection:text-primary">
         <Header />
-        
+
         <main>
-          {/* Hero Section with 3D Device and Animated Headlines */}
           <HeroSection />
-          
-          {/* Features Showcase with 3D Icons */}
           <FeaturesShowcase />
-          
-          {/* Live Dashboard Preview with Interactive Elements */}
           <DashboardPreview />
-          
-          {/* 3-Step Workflow Demonstration */}
           <WorkflowSection />
-          
-          {/* Call-to-Action Section with Testimonials */}
           <CTASection />
         </main>
 
-        {/* Footer */}
-        <footer className="bg-dark-bg-secondary border-t border-dark-border-primary py-12">
-          <div className="max-w-7xl mx-auto content-spacing">
-            <div className="grid md:grid-cols-4 gap-8">
-              {/* Company Info */}
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-dark-accent-primary rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">N</span>
-                  </div>
-                  <span className="text-xl font-bold text-dark-text-primary">NoteNetra</span>
-                </div>
-                <p className="text-dark-text-muted text-sm leading-relaxed">
-                  Empowering MSMEs across India with smart transaction tracking and credit building solutions.
+        {/* Premium Footer */}
+        <footer className="relative bg-muted/20 border-t border-border mt-20 pt-24 pb-12 overflow-hidden">
+          {/* Subtle Background Glow */}
+          <div className="absolute -bottom-[20%] -left-[10%] w-[40%] h-[70%] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+
+          <div className="max-w-7xl mx-auto content-spacing relative z-10">
+            <div className="grid lg:grid-cols-12 gap-16 mb-20">
+              {/* Brand & Mission */}
+              <div className="lg:col-span-4 space-y-8">
+                <CustomLogo design="custom" showText />
+                <p className="text-muted-foreground text-lg leading-relaxed max-w-sm">
+                  Empowering 63 million Indian MSMEs with smart transaction tracking and formal credit accessibility.
                 </p>
                 <div className="flex space-x-4">
-                  <a href="#" className="text-dark-text-muted hover:text-dark-accent-primary transition-colors">
-                    <span className="sr-only">Facebook</span>
-                    <div className="w-8 h-8 bg-dark-bg-tertiary rounded-lg flex items-center justify-center hover:bg-dark-accent-primary hover:text-white transition-colors">
-                      <span className="text-sm font-bold">f</span>
-                    </div>
-                  </a>
-                  <a href="#" className="text-dark-text-muted hover:text-dark-accent-primary transition-colors">
-                    <span className="sr-only">Twitter</span>
-                    <div className="w-8 h-8 bg-dark-bg-tertiary rounded-lg flex items-center justify-center hover:bg-dark-accent-primary hover:text-white transition-colors">
-                      <span className="text-sm font-bold">t</span>
-                    </div>
-                  </a>
-                  <a href="#" className="text-dark-text-muted hover:text-dark-accent-primary transition-colors">
-                    <span className="sr-only">LinkedIn</span>
-                    <div className="w-8 h-8 bg-dark-bg-tertiary rounded-lg flex items-center justify-center hover:bg-dark-accent-primary hover:text-white transition-colors">
-                      <span className="text-sm font-bold">in</span>
-                    </div>
-                  </a>
+                  {['Facebook', 'Twitter', 'Linkedin', 'Instagram'].map((social) => (
+                    <a
+                      key={social}
+                      href="#"
+                      className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary hover:shadow-lg hover:shadow-primary/20 transition-all duration-300"
+                    >
+                      <Icon name={social} size={18} />
+                    </a>
+                  ))}
                 </div>
               </div>
 
-              {/* Quick Links */}
-              <div>
-  <h4 className="font-semibold text-dark-text-primary mb-4">Quick Links</h4>
-  <ul className="space-y-2 text-sm">
-    <li>
-      <a href="/features-page" className="text-dark-text-muted hover:text-dark-accent-primary hover:text-opacity-70 transition-colors">
-        Features
-      </a>
-    </li>
-    <li>
-      <a href="/pricing-page" className="text-dark-text-muted hover:text-dark-accent-primary hover:text-opacity-70 transition-colors">
-        Pricing
-      </a>
-    </li>
-    <li>
-      <a href="/dashboard-demo" className="text-dark-text-muted hover:text-dark-accent-primary hover:text-opacity-70 transition-colors">
-        Demo
-      </a>
-    </li>
-    <li>
-      <a href="/contact-page" className="text-dark-text-muted hover:text-dark-accent-primary hover:text-opacity-70 transition-colors">
-        Contact
-      </a>
-    </li>
-  </ul>
-</div>
+              {/* Quick Links Grid */}
+              <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-12">
+                <div className="space-y-6">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-foreground/40">Product</h4>
+                  <ul className="space-y-4">
+                    {['Features', 'Pricing', 'Dashboard Demo', 'Hardware'].map((link) => (
+                      <li key={link}>
+                        <a href="#" className="text-muted-foreground hover:text-primary transition-colors font-medium">{link}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
+                <div className="space-y-6">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-foreground/40">Company</h4>
+                  <ul className="space-y-4">
+                    {['About Us', 'Case Studies', 'Press Kit', 'Contact'].map((link) => (
+                      <li key={link}>
+                        <a href="#" className="text-muted-foreground hover:text-primary transition-colors font-medium">{link}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
-              {/* Support */}
-              <div>
-                <h4 className="font-semibold text-foreground mb-4">Support</h4>
-                <ul className="space-y-2 text-sm">
-                  <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Help Center</a></li>
-                  <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Documentation</a></li>
-                  <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">API Reference</a></li>
-                  <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Status Page</a></li>
-                </ul>
-              </div>
-
-              {/* Contact Info */}
-              <div>
-                <h4 className="font-semibold text-foreground mb-4">Contact</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>+91 9911940639</li>
-                  <li>+91 9625652435</li>
-                  <li>chaitanyasethi3336@gmail.com</li>
-                  <li>Mumbai, Maharashtra</li>
-                  <li>India</li>
-                </ul>
+                <div className="space-y-6">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-foreground/40">Newsletter</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Get regular updates on MSME growth hacks and financing tips.
+                  </p>
+                  <div className="relative group">
+                    <input
+                      type="email"
+                      placeholder="Your email"
+                      className="w-full h-12 bg-background border border-border rounded-xl px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                    />
+                    <button className="absolute right-2 top-2 w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center hover:scale-105 transition-transform">
+                      <Icon name="Send" size={14} />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-              <p className="text-sm text-muted-foreground">
-                © {new Date()?.getFullYear()} NoteNetra. All rights reserved.
-              </p>
-              <div className="flex space-x-6 mt-4 md:mt-0">
-                <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">Privacy Policy</a>
-                <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">Terms of Service</a>
-                <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">Cookie Policy</a>
+            {/* Bottom Bar */}
+            <div className="pt-12 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6">
+              <div className="flex flex-col md:flex-row items-center gap-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                <span>© {new Date().getFullYear()} NoteNetra</span>
+                <span className="hidden md:block w-1.5 h-1.5 bg-border rounded-full" />
+                <span>Made with ❤️ in India</span>
+              </div>
+
+              <div className="flex space-x-8 text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                <a href="#" className="hover:text-primary transition-colors">Privacy</a>
+                <a href="#" className="hover:text-primary transition-colors">Terms</a>
+                <a href="#" className="hover:text-primary transition-colors">Cookies</a>
               </div>
             </div>
           </div>
