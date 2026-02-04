@@ -35,23 +35,22 @@ const FeaturesShowcase = () => {
         const trans = parseFloat(monthlyTransactions);
         const age = parseFloat(businessAge);
 
-        // Base Score
-        let score = 400;
+        // Base Score (Deterministic starting point)
+        let score = 350;
 
-        // Revenue Factor (Logarithmic increase)
-        score += Math.min(200, Math.max(0, Math.log10(rev) * 35));
+        // Revenue Factor (Logarithmic increase - rewarding scale)
+        // A business with 1L revenue (10^5) gets ~175, 10L (10^6) gets ~210
+        score += Math.min(250, (Math.log10(rev || 1) * 35));
 
-        // Transaction Factor
-        score += Math.min(150, (trans / 100) * 15);
+        // Transaction Factor (Rewarding high volume/frequency)
+        // 500 transactions/mo is a good baseline
+        score += Math.min(150, (trans / 100) * 12);
 
-        // Age Factor
-        score += Math.min(100, age * 15);
+        // Age Factor (Rewarding stability)
+        // Max 100 points for 5+ years
+        score += Math.min(100, age * 20);
 
-        // Random slightly variance for realism
-        const variance = Math.floor(Math.random() * 21) - 10;
-        score += variance;
-
-        // Final Clamp
+        // Final Clamp (300-850 range)
         const finalScore = Math.floor(Math.max(300, Math.min(850, score)));
         setCreditScore(finalScore);
       } catch (err) {
