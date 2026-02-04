@@ -11,6 +11,7 @@ import Icon from '../../components/AppIcon';
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
   const { register, handleSubmit, formState: { errors } } = useForm({
