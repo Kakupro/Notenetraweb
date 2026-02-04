@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import CustomLogo from '../../components/ui/CustomLogo';
@@ -95,15 +96,22 @@ const RegisterPage = () => {
     }
   };
 
+  const auth = getAuth();
+
   const handleGoogleSignup = async () => {
     setIsLoading(true);
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
     try {
-      // Simulate Google OAuth
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Google signup initiated');
-      navigate('/dashboard-demo');
+      const result = await signInWithPopup(auth, provider);
+      if (result.user) {
+        navigate('/dashboard');
+      }
     } catch (error) {
       console.error('Google signup error:', error);
+      if (error.code !== 'auth/popup-closed-by-user') {
+        alert('Google sign-up failed. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -283,9 +291,9 @@ const RegisterPage = () => {
                       <div className="flex-1 bg-muted rounded-full h-1">
                         <div
                           className={`h-1 rounded-full transition-all ${passwordStrength?.strength === 1 ? 'bg-error w-1/4' :
-                              passwordStrength?.strength === 2 ? 'bg-warning w-2/4' :
-                                passwordStrength?.strength === 3 ? 'bg-primary w-3/4' :
-                                  passwordStrength?.strength === 4 ? 'bg-success w-full' : 'bg-error w-1/4'
+                            passwordStrength?.strength === 2 ? 'bg-warning w-2/4' :
+                              passwordStrength?.strength === 3 ? 'bg-primary w-3/4' :
+                                passwordStrength?.strength === 4 ? 'bg-success w-full' : 'bg-error w-1/4'
                             }`}
                         />
                       </div>
