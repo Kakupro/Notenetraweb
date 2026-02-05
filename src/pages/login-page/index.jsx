@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from 'firebase/auth'; // Removed getAuth
-import { auth } from '../../firebase'; // Import auth instance
+import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import CustomLogo from '../../components/ui/CustomLogo';
@@ -14,6 +13,7 @@ const LoginPage = () => {
   const [authError, setAuthError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+  const { login, loginWithGoogle } = useAuth();
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
@@ -26,12 +26,11 @@ const LoginPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-
   const onSubmit = async (data) => {
     setIsLoading(true);
     setAuthError('');
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
+      await login(data.email, data.password);
       navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
@@ -44,28 +43,18 @@ const LoginPage = () => {
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     setAuthError('');
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
     try {
-      const result = await signInWithPopup(auth, provider);
-      if (result.user) {
-        navigate('/dashboard');
-      }
+      await loginWithGoogle();
+      navigate('/dashboard');
     } catch (error) {
       console.error('Google login error:', error);
-      if (error.code !== 'auth/popup-closed-by-user') {
-        const errorMessage = error.message || 'Unknown error occurred';
-        setAuthError(`Google sign-in failed: ${errorMessage}`);
-      }
+      setAuthError('Google sign-in failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Complete sign-in persistence check
-  useEffect(() => {
-    setPersistence(auth, browserLocalPersistence).catch((e) => console.error('Set persistence error:', e));
-  }, [auth]);
+
 
   return (
     <>

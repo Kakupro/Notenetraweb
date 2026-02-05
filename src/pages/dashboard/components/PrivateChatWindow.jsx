@@ -1,100 +1,65 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { db, auth } from '../../../firebase';
-import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc, getDocs } from 'firebase/firestore';
-import { useAuthState } from 'react-firebase-hooks/auth';
 import { useParams } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 import AppIcon from '../../../components/AppIcon';
 import Input from '../../../components/ui/Input';
 import Button from '../../../components/ui/Button';
-import { Card } from '../../../components/ui/Card';
+
+// Mock Data
+const MOCK_MESSAGES = [
+  { id: '1', text: 'Hey, do you have stock available?', senderId: 'user-2', senderName: 'Rahul Store', timestamp: new Date(Date.now() - 3600000) },
+  { id: '2', text: 'Yes, we just restocked yesterday.', senderId: 'user-12345', senderName: 'Demo User', timestamp: new Date(Date.now() - 3500000) },
+  { id: '3', text: 'Great, I will place an order.', senderId: 'user-2', senderName: 'Rahul Store', timestamp: new Date(Date.now() - 3400000) }
+];
 
 const PrivateChatWindow = () => {
-  const { chatId } = useParams(); // Get chat ID from URL parameters
-  const [user] = useAuthState(auth);
+  const { chatId } = useParams();
+  const { user } = useAuth();
   const [newMessage, setNewMessage] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(MOCK_MESSAGES);
   const messagesEndRef = useRef(null);
-  const [allUsers, setAllUsers] = useState({}); // To store user profiles by UID
-
-  useEffect(() => {
-    if (!user || !chatId) return;
-
-    // Fetch all users once to map UIDs to display names
-    const fetchAllUsers = async () => {
-      const usersCollection = collection(db, 'users');
-      const usersSnapshot = await getDocs(usersCollection);
-      const usersData = {};
-      usersSnapshot.forEach(doc => {
-        usersData[doc.id] = doc.data();
-      });
-      setAllUsers(usersData);
-    };
-    fetchAllUsers();
-
-    const q = query(
-      collection(db, 'chats', chatId, 'messages'),
-      orderBy('timestamp')
-    );
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setMessages(snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })));
-    });
-
-    return () => unsubscribe();
-  }, [user, chatId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const sendMessage = async (e) => {
+  const sendMessage = (e) => {
     e.preventDefault();
     if (newMessage.trim() === '' || !user || !chatId) return;
 
-    await addDoc(collection(db, 'chats', chatId, 'messages'), {
+    const newMsg = {
+      id: Date.now().toString(),
       text: newMessage,
       senderId: user.uid,
-      senderName: user.displayName || user.email, // Use displayName, fallback to email
-      timestamp: serverTimestamp(),
-    });
+      senderName: user.displayName || user.email,
+      timestamp: new Date(),
+    };
 
-    // Update parent chat document with last message info
-    const chatRef = doc(db, 'chats', chatId);
-    await updateDoc(chatRef, {
-      lastMessageAt: serverTimestamp(),
-      lastMessageText: newMessage,
-    });
-
+    setMessages([...messages, newMsg]);
     setNewMessage('');
   };
 
   return (
     <div className="flex flex-col h-full bg-background text-foreground">
       <header className="bg-card p-4 border-b border-border flex items-center justify-between">
-        <h1 className="text-xl font-bold">Private Chat</h1>
-        {/* You might want to display the other participant's name/email here */}
+        <h1 className="text-xl font-bold">Private Chat ({chatId})</h1>
       </header>
 
       <main className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((msg) => {
-          const senderProfile = allUsers[msg.senderId];
-          const senderDisplayName = senderProfile?.displayName || senderProfile?.email || msg.senderName || 'Unknown User';
-          return (
+        {messages.map((msg) => (
           <div
             key={msg.id}
             className={`flex ${msg.senderId === user?.uid ? 'justify-end' : 'justify-start'}`}
           >
             <div className={`max-w-xs p-3 rounded-lg ${msg.senderId === user?.uid ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-              <p className="font-medium text-sm">{senderDisplayName}</p> {/* Display senderDisplayName */}
+              <p className="font-medium text-sm">{msg.senderName}</p>
               <p className="text-base">{msg.text}</p>
               <span className="text-xs opacity-75 block mt-1">
-                {msg.timestamp?.toDate().toLocaleString()}
+                {msg.timestamp?.toLocaleString()}
               </span>
             </div>
           </div>
-        )})}
+        ))}
         <div ref={messagesEndRef} />
       </main>
 

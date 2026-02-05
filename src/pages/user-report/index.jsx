@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import AppIcon from '../../components/AppIcon';
+
+// Mock Data
+const MOCK_USERS = {
+  'user-1': { id: 'user-1', displayName: 'Amit General Store', email: 'amit@example.com', role: 'user', cibilScore: 720, shopAddress: '123 Market', aboutBusiness: 'Grocery', createdAt: new Date().toISOString() },
+  'user-2': { id: 'user-2', displayName: 'Rahul Textiles', email: 'rahul@example.com', role: 'user', cibilScore: 680, shopAddress: '45 Civil Lines', aboutBusiness: 'Clothing', createdAt: new Date().toISOString() },
+  'user-3': { id: 'user-3', displayName: 'Priya Electronics', email: 'priya@example.com', role: 'user', cibilScore: 750, shopAddress: 'Mall Road', aboutBusiness: 'Electronics', createdAt: new Date().toISOString() }
+};
 
 const UserReportPage = () => {
   const { userId } = useParams();
@@ -14,26 +19,15 @@ const UserReportPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        if (!userId) {
-          setError('Missing user id');
-          setLoading(false);
-          return;
-        }
-        const ref = doc(db, 'users', userId);
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          setUser({ id: snap.id, ...snap.data() });
-        } else {
-          setError('User not found');
-        }
-      } catch (err) {
-        console.error('Failed to fetch user:', err);
-        setError('Failed to load user');
-      } finally {
-        setLoading(false);
+    // Mock user fetching
+    const fetchUser = () => {
+      if (MOCK_USERS[userId]) {
+        setUser(MOCK_USERS[userId]);
+      } else {
+        // Fallback for demo
+        setUser({ id: userId, displayName: 'Demo User', email: 'demo@example.com', role: 'user' });
       }
+      setLoading(false);
     };
     fetchUser();
   }, [userId]);
@@ -92,7 +86,7 @@ const UserReportPage = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Created At</p>
-                <p className="text-foreground">{user.createdAt?.toDate ? user.createdAt.toDate().toLocaleString() : (user.createdAt || 'N/A')}</p>
+                <p className="text-foreground">{user.createdAt || 'N/A'}</p>
               </div>
             </div>
           </CardContent>

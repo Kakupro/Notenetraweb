@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import Icon from '../../../components/AppIcon';
-import { getAuth } from 'firebase/auth';
-import { database } from '../../../firebase';
-import { ref, onValue } from 'firebase/database';
+import { useAuth } from '../../../context/AuthContext';
 import Button from '../../../components/ui/Button';
 import { demoData, formatCurrency, formatDate } from '../../../utils/demoData';
 import { computeCreditScoreFromTransactions } from '../../../utils/msmeScore';
@@ -15,105 +13,12 @@ const OverviewView = ({ children }) => {
   const [creditScoreHistory, setCreditScoreHistory] = useState(demoData.creditScoreHistory);
   const [recentTransactions, setRecentTransactions] = useState(demoData.recentTransactions);
   const [scoreResult, setScoreResult] = useState(null);
-  const auth = getAuth();
-  const user = auth.currentUser;
-
+  const { user } = useAuth();
   useEffect(() => {
     if (user) {
-      // Fetch from ESP32 path: transactions/esp
-      const transactionsRef = ref(database, `transactions/esp`);
-      const creditHistoryRef = ref(database, `creditHistory/${user.uid}`);
-
-      onValue(transactionsRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          const transactions = Object.values(data).filter(t => t && t.time);
-
-          // Calculate KPIs from ESP32 data
-          const totalRevenue = transactions.filter(t => t.type === 'credit').reduce((acc, t) => acc + (t.amount || 0), 0);
-          const totalDebits = transactions.filter(t => t.type === 'debit').reduce((acc, t) => acc + (t.amount || 0), 0);
-          const totalTransactions = transactions.length;
-          const currentBalance = totalRevenue - totalDebits;
-
-          // Compute real-time credit score from cash transactions
-          const computed = computeCreditScoreFromTransactions(
-            transactions.map(t => ({
-              time: t.time,
-              amount: t.amount || 0,
-              type: t.type, // 'credit' or 'debit'
-            }))
-          );
-          setScoreResult(computed);
-
-          setKpiData([
-            { title: "Total Revenue", value: `₹${totalRevenue.toLocaleString('en-IN')}`, icon: "TrendingUp", color: "text-green-400", bgColor: "bg-green-500/10", borderColor: "border-green-500/20", change: "" },
-            { title: "Total Transactions", value: totalTransactions, icon: "Receipt", color: "text-cyan-400", bgColor: "bg-cyan-500/10", borderColor: "border-cyan-500/20", change: "" },
-            { title: "Credit Score", value: computed?.score300to900 ?? '—', icon: "Award", color: "text-cyan-400", bgColor: "bg-cyan-500/10", borderColor: "border-cyan-500/20", change: "" },
-            { title: "Current Balance", value: `₹${currentBalance.toLocaleString('en-IN')}`, icon: "Wallet", color: "text-amber-400", bgColor: "bg-amber-500/10", borderColor: "border-amber-500/20", change: "" },
-          ]);
-
-          // Process revenue data for chart
-          const monthlyRevenue = transactions.reduce((acc, t) => {
-            if (t.time) {
-              let date;
-              if (typeof t.time === 'string') {
-                // Try parsing DD-MM-YYYY or ISO string
-                if (t.time.match(/^\d{2}-\d{2}-\d{4}/)) {
-                  date = new Date(t.time.replace(/(\d{2})-(\d{2})-(\d{4})/, '$3-$2-$1'));
-                } else {
-                  date = new Date(t.time);
-                }
-              } else if (typeof t.time === 'number') {
-                date = new Date(t.time);
-              }
-
-              if (date && !isNaN(date.getTime())) {
-                const month = date.toLocaleString('default', { month: 'short' });
-                if (t.type === 'credit') {
-                  acc[month] = (acc[month] || 0) + (t.amount || 0);
-                }
-              }
-            }
-            return acc;
-          }, {});
-          setRevenueData(Object.keys(monthlyRevenue).map(month => ({ month, revenue: monthlyRevenue[month] })));
-
-          // Process payment method data (ESP32 only sends cash transactions)
-          setPaymentMethodData([
-            { name: 'Cash', value: 100, color: '#10B981' }
-          ]);
-
-          // Set recent transactions (last 5)
-          const recent = transactions
-            .sort((a, b) => {
-              const getTime = (time) => {
-                if (typeof time === 'string') {
-                  if (time.match(/^\d{2}-\d{2}-\d{4}/)) {
-                    return new Date(time.replace(/(\d{2})-(\d{2})-(\d{4})/, '$3-$2-$1')).getTime();
-                  }
-                  return new Date(time).getTime();
-                }
-                return new Date(time).getTime();
-              }
-              return getTime(b.time) - getTime(a.time);
-            })
-            .slice(0, 5)
-            .map(t => ({
-              ...t,
-              mode: 'cash',
-              time: t.time
-            }));
-          setRecentTransactions(recent);
-        }
-      });
-
-      onValue(creditHistoryRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          const history = Object.values(data).sort((a, b) => new Date(a.date) - new Date(b.date));
-          setCreditScoreHistory(history);
-        }
-      });
+      // Logic to load data locally or just use demo data
+      // For now, we just rely on the initial state set from demoData
+      // If we wanted to simulate 'loading' we could do it here
     }
   }, [user]);
 

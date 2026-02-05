@@ -5,7 +5,7 @@ import Sidebar from './components/Sidebar';
 import MobileBottomNav from './components/MobileBottomNav';
 import ChatWidget from '../../components/ChatWidget';
 import DeviceStatus from '../../components/DeviceStatus';
-import { getAuth } from 'firebase/auth';
+import { useAuth } from '../../context/AuthContext';
 import { useLocation } from 'react-router-dom';
 
 const DashboardPage = ({ theme, toggleTheme }) => {
@@ -13,8 +13,7 @@ const DashboardPage = ({ theme, toggleTheme }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const auth = getAuth();
-  const user = auth.currentUser;
+  const { user } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
@@ -82,7 +81,7 @@ const DashboardPage = ({ theme, toggleTheme }) => {
   return (
     <div className="flex flex-col h-screen bg-background">
       <Header user={user} theme={theme} toggleTheme={toggleTheme} />
-      
+
       <div className="flex flex-1 overflow-hidden">
         {!isMobile && (
           <Sidebar

@@ -1,77 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { db, auth } from '../../../firebase';
-import { collection, query, where, onSnapshot, getDocs, addDoc } from 'firebase/firestore';
-import { useAuthState } from 'react-firebase-hooks/auth';
 import { useNavigate } from 'react-router-dom';
-import { Card } from '../../../components/ui/Card'; // Corrected import path and named import
-import Button from '../../../components/ui/Button'; // Corrected import path and default import
-import Input from '../../../components/ui/Input'; // Corrected import path and default import
-import AppIcon from '../../../components/AppIcon';
-import { serverTimestamp } from 'firebase/firestore';
+import { Card } from '../../../components/ui/Card';
+import Button from '../../../components/ui/Button';
+import Input from '../../../components/ui/Input';
+import { useAuth } from '../../../context/AuthContext';
+
+// Mock Data
+const MOCK_USERS = [
+  { id: 'user-2', email: 'rahul@example.com', displayName: 'Rahul Store' },
+  { id: 'user-3', email: 'priya@example.com', displayName: 'Priya Electronics' }
+];
+
+const MOCK_CHATS = [
+  { id: 'chat-1', participants: ['user-12345', 'user-2'], lastMessageText: 'Hey, do you have stock?' }
+];
 
 const PrivateChatList = () => {
-  const [user] = useAuthState(auth);
-  const [users, setUsers] = useState([]);
+  const { user } = useAuth();
+  const [users, setUsers] = useState(MOCK_USERS);
   const [searchTerm, setSearchTerm] = useState('');
-  const [chats, setChats] = useState([]);
+  const [chats, setChats] = useState(MOCK_CHATS);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!user) return;
-
-    // Fetch all users to enable starting new chats
-    const usersQuery = query(collection(db, 'users'));
-    const unsubscribeUsers = onSnapshot(usersQuery, (snapshot) => {
-      setUsers(snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })).filter(u => u.id !== user.uid)); // Filter out the current user
-    });
-
-    // Fetch existing private chats for the current user
-    const chatsQuery = query(
-      collection(db, 'chats'),
-      where('participants', 'array-contains', user.uid)
-    );
-    const unsubscribeChats = onSnapshot(chatsQuery, (snapshot) => {
-      setChats(snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })));
-    });
-
-    return () => {
-      unsubscribeUsers();
-      unsubscribeChats();
-    };
-  }, [user]);
-
-  const handleStartChat = async (targetUserId) => {
-    if (!user) return;
-
-    const participants = [user.uid, targetUserId].sort(); // Ensure consistent order
-    const existingChatQuery = query(
-      collection(db, 'chats'),
-      where('participants', '==', participants)
-    );
-
-    const querySnapshot = await getDocs(existingChatQuery);
-
-    let chatId;
-    if (!querySnapshot.empty) {
-      chatId = querySnapshot.docs[0].id;
+  const handleStartChat = (targetUserId) => {
+    // In a real app we would check for existing chat or create one
+    // For demo, we just navigate to a dummy chat ID or the existing one
+    const existingChat = chats.find(chat => chat.participants.includes(targetUserId));
+    if (existingChat) {
+      navigate(`/dashboard/private-chat/${existingChat.id}`);
     } else {
-      // Create a new chat
-      const newChatRef = await addDoc(collection(db, 'chats'), {
-        participants: participants,
-        createdAt: serverTimestamp(),
-        lastMessageAt: serverTimestamp(), // Initialize with creation time
-        lastMessageText: '',
-      });
-      chatId = newChatRef.id;
+      // Simulate creating a new chat ID
+      const newChatId = `chat-new-${Date.now()}`;
+      navigate(`/dashboard/private-chat/${newChatId}`);
     }
-
-    navigate(`/dashboard/private-chat/${chatId}`);
   };
 
   const filteredUsers = users.filter(u =>
@@ -99,28 +60,28 @@ const PrivateChatList = () => {
             <Card key={u.id} className="p-3 flex items-center justify-between">
               <div>
                 <p className="font-medium">{u.displayName || u.email}</p>
-                <p className="text-sm text-muted-foreground">{u.email}</p> {/* Keep email for clarity here */}
+                <p className="text-sm text-muted-foreground">{u.email}</p>
               </div>
               <Button onClick={() => handleStartChat(u.id)}>Chat</Button>
             </Card>
           ))
         ) : (
-          <p className="text-muted-foreground">No users found or no existing chats.</p>
+          <p className="text-muted-foreground">No users found.</p>
         )}
 
         {chats.length > 0 && (
           <>
             <h3 className="text-xl font-bold mt-6 mb-3">Your Chats</h3>
             {chats.map((chat) => {
-              const otherParticipantId = chat.participants.find(pId => pId !== user.uid);
-              const otherParticipant = users.find(u => u.id === otherParticipantId);
+              const otherParticipantId = chat.participants.find(pId => pId !== user?.uid);
+              const otherParticipant = users.find(u => u.id === otherParticipantId) || { displayName: 'Unknown User' };
               return (
                 <Card key={chat.id} className="p-3 flex items-center justify-between">
                   <div>
-                    <p className="font-medium">{otherParticipant?.displayName || otherParticipant?.email || 'Unknown User'}</p>
-                    <p className="text-sm text-muted-foreground">Last message: {chat.lastMessageText || 'No messages yet'}</p> {/* Use lastMessageText, which stores senderName */}
+                    <p className="font-medium">{otherParticipant.displayName}</p>
+                    <p className="text-sm text-muted-foreground">Last message: {chat.lastMessageText}</p>
                   </div>
-                  <Button onClick={() => handleStartChat(chat.id)}>Open Chat</Button> {/* This will open the existing chat */}
+                  <Button onClick={() => navigate(`/dashboard/private-chat/${chat.id}`)}>Open Chat</Button>
                 </Card>
               );
             })}

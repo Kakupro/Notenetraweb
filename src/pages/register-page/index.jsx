@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth } from '../../firebase';
+import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import CustomLogo from '../../components/ui/CustomLogo';
@@ -16,6 +15,7 @@ const RegisterPage = () => {
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const navigate = useNavigate();
+  const { loginWithGoogle } = useAuth(); // We can re-use loginWithGoogle or creating a register mock
 
   const { register, handleSubmit, formState: { errors }, watch, getValues } = useForm({
     defaultValues: {
@@ -99,19 +99,12 @@ const RegisterPage = () => {
 
   const handleGoogleSignup = async () => {
     setIsLoading(true);
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
     try {
-      const result = await signInWithPopup(auth, provider);
-      if (result.user) {
-        navigate('/dashboard');
-      }
+      await loginWithGoogle();
+      navigate('/dashboard');
     } catch (error) {
       console.error('Google signup error:', error);
-      if (error.code !== 'auth/popup-closed-by-user') {
-        const errorMessage = error.message || 'Unknown error occurred';
-        alert(`Google sign-up failed: ${errorMessage}`);
-      }
+      alert('Google sign-up failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

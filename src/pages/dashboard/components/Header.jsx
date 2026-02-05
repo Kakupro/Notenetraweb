@@ -2,17 +2,16 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
-import { getAuth, signOut } from 'firebase/auth';
-import useTheme from '../../../hooks/useTheme';
+import { useAuth } from '../../../context/AuthContext';
 import { LOGO_CONFIG } from '../../../utils/logoConfig';
 
-const Header = ({ user, theme, toggleTheme }) => {
+const Header = ({ theme, toggleTheme }) => {
   const navigate = useNavigate();
-  const auth = getAuth();
+  const { user, logout } = useAuth();
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      await logout();
       navigate('/login-page');
     } catch (error) {
       console.error("Error signing out:", error);
@@ -25,9 +24,9 @@ const Header = ({ user, theme, toggleTheme }) => {
         <div className="flex items-center space-x-4">
           <Link to="/dashboard" className="flex items-center space-x-2">
             <div className={`${LOGO_CONFIG.size.width} ${LOGO_CONFIG.size.height} rounded-lg flex items-center justify-center shadow-md overflow-hidden`}>
-              <img 
-                src={LOGO_CONFIG.imagePath} 
-                alt={LOGO_CONFIG.altText} 
+              <img
+                src={LOGO_CONFIG.imagePath}
+                alt={LOGO_CONFIG.altText}
                 className="w-full h-full object-contain"
                 onError={(e) => {
                   // Fallback to default logo if custom logo fails to load

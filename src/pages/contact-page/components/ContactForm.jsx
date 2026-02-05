@@ -3,11 +3,9 @@ import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
 import Icon from '../../../components/AppIcon';
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import { app } from '../../../firebase';
-
-const functions = getFunctions(app);
-const submitContactForm = httpsCallable(functions, 'submitContactForm');
+const mockSubmitContactForm = async (data) => {
+  return new Promise((resolve) => setTimeout(resolve, 1500));
+};
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -78,7 +76,7 @@ const ContactForm = () => {
     if (field === 'phone') {
       value = formatPhoneNumber(value);
     }
-    
+
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -94,7 +92,7 @@ const ContactForm = () => {
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -102,7 +100,7 @@ const ContactForm = () => {
     setIsSubmitting(true);
 
     try {
-      await submitContactForm(formData);
+      await mockSubmitContactForm(formData);
       setIsSubmitted(true);
     } catch (error) {
       console.error("Error submitting contact form:", error);
@@ -228,9 +226,8 @@ const ContactForm = () => {
             value={formData?.message}
             onChange={(e) => handleInputChange('message', e?.target?.value)}
             rows={5}
-            className={`w-full px-4 py-3 border rounded-lg bg-input text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-micro resize-none ${
-              errors?.message ? 'border-error' : 'border-border'
-            }`}
+            className={`w-full px-4 py-3 border rounded-lg bg-input text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-micro resize-none ${errors?.message ? 'border-error' : 'border-border'
+              }`}
             required
           />
           {errors?.message && (

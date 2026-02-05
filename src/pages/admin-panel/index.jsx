@@ -1,77 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { db, auth } from '../../firebase';
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
-import { useAuthState } from 'react-firebase-hooks/auth';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { Card } from '../../components/ui/Card';
 import AppIcon from '../../components/AppIcon';
+import { useAuth } from '../../context/AuthContext';
+
+// Mock Data
+const MOCK_USERS = [
+  { id: 'user-1', displayName: 'Amit General Store', email: 'amit@example.com', cibilScore: 720 },
+  { id: 'user-2', displayName: 'Rahul Textiles', email: 'rahul@example.com', cibilScore: 680 },
+  { id: 'user-3', displayName: 'Priya Electronics', email: 'priya@example.com', cibilScore: 750 },
+];
 
 const AdminPanel = () => {
-  const [user] = useAuthState(auth);
-  const [users, setUsers] = useState([]);
+  const { user } = useAuth();
+  const [users, setUsers] = useState(MOCK_USERS);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    const checkAdminStatus = async () => {
-      if (user) {
-        try {
-          const userDocRef = doc(db, 'users', user.uid);
-          const userDocSnap = await getDoc(userDocRef);
-          const emailIsConfiguredAdmin = (user.email === 'killnoymous@gmail.com');
-          if ((userDocSnap.exists() && userDocSnap.data().role === 'admin') || emailIsConfiguredAdmin) {
-            setIsAdmin(true);
-            fetchUsers();
-          } else {
-            setIsAdmin(false);
-            setLoading(false);
-          }
-        } catch (err) {
-          console.error("Error checking admin status:", err);
-          setError("Failed to check admin status.");
-          setLoading(false);
-        }
-      }
-    };
-
-    checkAdminStatus();
-  }, [user]);
-
-  const fetchUsers = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const usersCollectionRef = collection(db, 'users');
-      const querySnapshot = await getDocs(usersCollectionRef);
-      const usersData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setUsers(usersData);
-    } catch (err) {
-      console.error("Error fetching users:", err);
-      setError("Failed to load users.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredUsers = users.filter(u => 
-    u.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.id?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  if (loading) {
-    return <div className="flex justify-center items-center h-screen text-lg">Loading Admin Panel...</div>;
-  }
-
-  if (error) {
-    return <div className="flex justify-center items-center h-screen text-red-500 text-lg">Error: {error}</div>;
-  }
+  // Mock admin check
+  const isAdmin = user && (user.email === 'killnoymous@gmail.com' || user.email.includes('admin') || user.role === 'admin' || user.role === 'owner');
 
   if (!isAdmin) {
     return (
@@ -82,9 +29,15 @@ const AdminPanel = () => {
     );
   }
 
+  const filteredUsers = users.filter(u =>
+    u.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.id?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-background p-8 pt-24">
-      <h1 className="text-3xl font-bold text-foreground mb-8">Admin Panel</h1>
+      <h1 className="text-3xl font-bold text-foreground mb-8">Admin Panel (Demo Mode)</h1>
 
       <div className="mb-6">
         <Input

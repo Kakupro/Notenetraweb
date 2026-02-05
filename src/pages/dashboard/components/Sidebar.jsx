@@ -2,15 +2,16 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
-import { getAuth, signOut } from 'firebase/auth';
+import { useAuth } from '../../../context/AuthContext';
 
 const Sidebar = ({ isCollapsed, onToggleCollapse, user }) => {
+  // User is passed as prop but we can also get it from context if needed, but here it keeps component clean
   const navigate = useNavigate();
-  const auth = getAuth();
+  const { logout } = useAuth(); // Retrieve logout function from context
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      await logout();
       navigate('/login-page');
     } catch (error) {
       console.error("Error signing out:", error);
@@ -27,9 +28,8 @@ const Sidebar = ({ isCollapsed, onToggleCollapse, user }) => {
   ];
 
   return (
-    <aside className={`bg-dark-bg-card border-r border-dark-border-primary transition-all duration-300 flex flex-col ${
-      isCollapsed ? 'w-16' : 'w-64'
-    } h-full`}>
+    <aside className={`bg-dark-bg-card border-r border-dark-border-primary transition-all duration-300 flex flex-col ${isCollapsed ? 'w-16' : 'w-64'
+      } h-full`}>
       <div className="flex items-center justify-between p-4 border-b border-dark-border-primary">
         {!isCollapsed && (
           <h2 className="text-lg font-semibold text-dark-text-primary">Dashboard</h2>
@@ -38,9 +38,9 @@ const Sidebar = ({ isCollapsed, onToggleCollapse, user }) => {
           onClick={onToggleCollapse}
           className="p-2 rounded-lg hover:bg-dark-bg-tertiary transition-colors"
         >
-          <Icon 
-            name={isCollapsed ? "ChevronRight" : "ChevronLeft"} 
-            size={20} 
+          <Icon
+            name={isCollapsed ? "ChevronRight" : "ChevronLeft"}
+            size={20}
             color="currentColor"
           />
         </button>
@@ -49,18 +49,17 @@ const Sidebar = ({ isCollapsed, onToggleCollapse, user }) => {
         {menuItems?.map((item) => (
           <NavLink
             key={item?.id}
-            to={item?.path} 
+            to={item?.path}
             end={item?.id === 'overview'} // Use 'end' for the overview to match exact path
             className={({ isActive }) =>
-              `w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                isActive
-                  ? 'bg-dark-accent-primary/20 text-dark-accent-primary border border-dark-accent-primary/30' :'text-dark-text-secondary hover:bg-dark-bg-tertiary hover:text-dark-text-primary'
+              `w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${isActive
+                ? 'bg-dark-accent-primary/20 text-dark-accent-primary border border-dark-accent-primary/30' : 'text-dark-text-secondary hover:bg-dark-bg-tertiary hover:text-dark-text-primary'
               }`
             }
           >
-            <Icon 
-              name={item?.icon} 
-              size={20} 
+            <Icon
+              name={item?.icon}
+              size={20}
               // activeView is no longer used here, NavLink's isActive handles styling
               color={'currentColor'}
             />
@@ -86,7 +85,7 @@ const Sidebar = ({ isCollapsed, onToggleCollapse, user }) => {
             </div>
           )}
         </div>
-        
+
         <Button
           variant="outline"
           size="sm"
