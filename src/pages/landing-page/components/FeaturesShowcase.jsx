@@ -1,10 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Icon from '../../../components/AppIcon';
-import { functions } from '../../../firebase';
-import { httpsCallable } from 'firebase/functions';
 import Button from '../../../components/ui/Button';
-
 const FeaturesShowcase = () => {
   const [hoveredFeature, setHoveredFeature] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -16,8 +13,6 @@ const FeaturesShowcase = () => {
   const [creditScore, setCreditScore] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const calculateScore = httpsCallable(functions, 'calculateCreditScore');
 
   const handleCalculateCreditScore = async () => {
     if (!monthlyRevenue || !monthlyTransactions || !businessAge) {

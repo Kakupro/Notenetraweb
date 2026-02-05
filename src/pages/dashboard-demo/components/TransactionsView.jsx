@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { database } from '../../../firebase';
-import { ref, onValue } from 'firebase/database';
+
 import Icon from '../../../components/AppIcon';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
@@ -15,54 +14,8 @@ const TransactionsView = () => {
   const userId = "8Z642cHB2pXTGv8BnCbrzMYGWz23"; // Updated user ID to match Firebase
 
   useEffect(() => {
-    // Fetch from ESP32 path: transactions/esp
-    const transactionsRef = ref(database, `transactions/esp`);
-    
-    const unsubscribe = onValue(transactionsRef, (snapshot) => {
-      const data = snapshot.val();
-      const loadedTransactions = [];
-      if (data) {
-        Object.keys(data).forEach((key) => {
-          const transaction = data[key];
-          
-          // Handle the ESP32 data structure
-          if (transaction && transaction.time) {
-            // Parse the timestamp from ESP32 format
-            const timestamp = transaction.time;
-            const datePart = timestamp.split(' ')[0]; // Get date part
-            const timePart = timestamp.split(' ')[1]; // Get time part
-            
-            loadedTransactions.push({
-              id: key, 
-              date: datePart,
-              time: timePart,
-              customer: `ESP32 Device`, 
-              amount: transaction.amount || 0,
-              type: transaction.mode || 'cash', // Use 'mode' for payment type (Cash, UPI, Card)
-              transactionType: transaction.type || 'unknown', // 'credit' or 'debit'
-              status: 'completed', 
-              items: `${transaction.amount} Rs ${transaction.type === 'credit' ? 'Added' : 'Removed'}`
-            });
-          }
-        });
-        
-        // Sort by timestamp (newest first)
-        loadedTransactions.sort((a, b) => {
-          const dateA = new Date(`${a.date} ${a.time}`);
-          const dateB = new Date(`${b.date} ${b.time}`);
-          return dateB - dateA;
-        });
-      }
-      setTransactions(loadedTransactions);
-    }, (error) => {
-      console.error("Error fetching transactions:", error);
-      // Fallback to demo data if ESP32 data is not available
-      setTransactions(demoData.transactions);
-    });
-
-    return () => {
-      unsubscribe();
-    };
+    // Fetched demo transaction data
+    setTransactions(demoData.transactions);
   }, [userId]);
 
   const typeOptions = [
@@ -104,8 +57,8 @@ const TransactionsView = () => {
 
   const filteredTransactions = transactions?.filter(transaction => {
     const matchesSearch = transaction?.customer?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
-                         transaction?.items?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
-                         transaction?.id?.toLowerCase()?.includes(searchTerm?.toLowerCase());
+      transaction?.items?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
+      transaction?.id?.toLowerCase()?.includes(searchTerm?.toLowerCase());
     const matchesType = filterType === 'all' || transaction?.type === filterType || transaction?.transactionType === filterType; // Check both mode and transactionType
     return matchesSearch && matchesType;
   });
@@ -128,7 +81,7 @@ const TransactionsView = () => {
             Export
           </Button>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-lg p-4">
             <div className="flex items-center space-x-3">
@@ -139,7 +92,7 @@ const TransactionsView = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
             <div className="flex items-center space-x-3">
               <Icon name="TrendingUp" size={24} color="#10b981" />
@@ -149,7 +102,7 @@ const TransactionsView = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
             <div className="flex items-center space-x-3">
               <Icon name="TrendingDown" size={24} color="#ef4444" />
@@ -183,14 +136,14 @@ const TransactionsView = () => {
             onChange={(e) => setSearchTerm(e?.target?.value)}
             className="w-full"
           />
-          
+
           <Select
             options={typeOptions}
             value={filterType}
             onChange={setFilterType}
             placeholder="Filter by mode/type"
           />
-          
+
           <Select
             options={dateOptions}
             value={dateRange}
@@ -217,11 +170,10 @@ const TransactionsView = () => {
             </thead>
             <tbody>
               {filteredTransactions?.map((transaction, index) => (
-                <tr 
-                  key={transaction?.id} 
-                  className={`border-b border-dark-border-primary hover:bg-dark-bg-tertiary transition-colors ${
-                    index % 2 === 0 ? 'bg-dark-bg-card' : 'bg-dark-bg-secondary'
-                  }`}
+                <tr
+                  key={transaction?.id}
+                  className={`border-b border-dark-border-primary hover:bg-dark-bg-tertiary transition-colors ${index % 2 === 0 ? 'bg-dark-bg-card' : 'bg-dark-bg-secondary'
+                    }`}
                 >
                   <td className="py-4 px-6">
                     <span className="font-mono text-sm text-cyan-400">{transaction?.id}</span>
@@ -266,7 +218,7 @@ const TransactionsView = () => {
             </tbody>
           </table>
         </div>
-        
+
         {filteredTransactions?.length === 0 && (
           <div className="text-center py-12">
             <Icon name="Search" size={48} color="#9ca3af" className="mx-auto mb-4" />
