@@ -15,7 +15,7 @@ const RegisterPage = () => {
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const navigate = useNavigate();
-  const { loginWithGoogle } = useAuth(); // We can re-use loginWithGoogle or creating a register mock
+  const { loginWithGoogle, signup } = useAuth();
 
   const { register, handleSubmit, formState: { errors }, watch, getValues } = useForm({
     defaultValues: {
@@ -79,19 +79,18 @@ const RegisterPage = () => {
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Registration attempt:', {
-        ...data,
-        acceptTerms,
-        acceptPrivacy,
-        timestamp: new Date()?.toISOString()
+      await signup(data.email, data.password, {
+        businessName: data.businessName,
+        ownerName: data.ownerName,
+        phone: data.phone,
+        businessType: data.businessType
       });
 
-      // For now, redirect to login with success message
-      navigate('/login-page?registered=true');
+      console.log('Registration successful');
+      navigate('/dashboard'); // Direct to dashboard since they are now logged in
     } catch (error) {
       console.error('Registration error:', error);
+      alert(error.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

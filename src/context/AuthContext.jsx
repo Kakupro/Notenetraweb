@@ -1,73 +1,93 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { auth, db } from '../firebase';
+import {
+    signInWithPopup,
+    GoogleAuthProvider,
+    signOut,
+    onAuthStateChanged,
+    signInWithEmailAndPassword
+} from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-// Create the context
 const AuthContext = createContext(null);
 
-// Hook to access the context
 export const useAuth = () => useContext(AuthContext);
 
-// Provider component
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check local storage for an existing session
-        const storedUser = localStorage.getItem('mockUser');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
-        setLoading(false);
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            if (firebaseUser) {
+                let role = 'user';
+                // Try to fetch extended profile/role from Firestore
+                try {
+                    const docRef = doc(db, 'users', firebaseUser.uid);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        role = docSnap.data().role || 'user';
+                    } else {
+                        // Create basic user doc if it doesn't exist
+                        await setDoc(docRef, {
+                            email: firebaseUser.email,
+                            displayName: firebaseUser.displayName,
+                            photoURL: firebaseUser.photoURL,
+                            role: 'user',
+                            createdAt: new Date()
+                        });
+                    }
+                } catch (e) {
+                    console.error("Error fetching user profile:", e);
+                    // Fallback for configured admin if DB fails
+                    if (firebaseUser.email === 'killnoymous@gmail.com') {
+                        role = 'admin';
+                    }
+                }
+
+                setUser({ ...firebaseUser, role });
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
     }, []);
 
-    const login = async (email, password) => {
-        // Mock login logic
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                if (email && password) {
-                    const fakeUser = {
-                        uid: 'user-12345',
-                        email: email,
-                        displayName: email.split('@')[0],
-                        photoURL: '',
-                        role: 'owner'
-                    };
-                    localStorage.setItem('mockUser', JSON.stringify(fakeUser));
-                    setUser(fakeUser);
-                    resolve(fakeUser);
-                } else {
-                    reject(new Error("Invalid credentials"));
-                }
-            }, 500); // Simulate network delay
-        });
+    const login = (email, password) => {
+        return signInWithEmailAndPassword(auth, email, password);
     };
 
-    const loginWithGoogle = async () => {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const fakeUser = {
-                    uid: 'google-user-12345',
-                    email: 'demo@gmail.com',
-                    displayName: 'Demo User',
-                    photoURL: '',
-                    role: 'owner'
-                };
-                localStorage.setItem('mockUser', JSON.stringify(fakeUser));
-                setUser(fakeUser);
-                resolve(fakeUser);
-            }, 500);
-        });
+    const signup = async (email, password, additionalData) => {
+        const result = await createUserWithEmailAndPassword(auth, email, password);
+        // Create user document in Firestore with additional data
+        if (result.user) {
+            await setDoc(doc(db, 'users', result.user.uid), {
+                email: email,
+                role: 'user',
+                createdAt: new Date(),
+                ...additionalData
+            });
+        }
+        return result;
     };
 
-    const logout = async () => {
-        localStorage.removeItem('mockUser');
-        setUser(null);
+    const loginWithGoogle = () => {
+        const provider = new GoogleAuthProvider();
+        return signInWithPopup(auth, provider);
+    };
+
+    const logout = () => {
+        return signOut(auth);
     };
 
     const value = {
         user,
         loading,
         login,
+        signup,
         loginWithGoogle,
         logout
     };
