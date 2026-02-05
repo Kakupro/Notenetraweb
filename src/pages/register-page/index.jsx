@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../../firebase';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import CustomLogo from '../../components/ui/CustomLogo';
@@ -96,8 +97,6 @@ const RegisterPage = () => {
     }
   };
 
-  const auth = getAuth();
-
   const handleGoogleSignup = async () => {
     setIsLoading(true);
     const provider = new GoogleAuthProvider();
@@ -110,7 +109,8 @@ const RegisterPage = () => {
     } catch (error) {
       console.error('Google signup error:', error);
       if (error.code !== 'auth/popup-closed-by-user') {
-        alert('Google sign-up failed. Please try again.');
+        const errorMessage = error.message || 'Unknown error occurred';
+        alert(`Google sign-up failed: ${errorMessage}`);
       }
     } finally {
       setIsLoading(false);

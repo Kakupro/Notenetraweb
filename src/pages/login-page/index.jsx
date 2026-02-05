@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, setPersistence, browserLocalPersistence } from 'firebase/auth';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from 'firebase/auth'; // Removed getAuth
+import { auth } from '../../firebase'; // Import auth instance
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import CustomLogo from '../../components/ui/CustomLogo';
@@ -25,7 +26,6 @@ const LoginPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const auth = getAuth();
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -54,7 +54,8 @@ const LoginPage = () => {
     } catch (error) {
       console.error('Google login error:', error);
       if (error.code !== 'auth/popup-closed-by-user') {
-        setAuthError('Google sign-in failed. Please try again.');
+        const errorMessage = error.message || 'Unknown error occurred';
+        setAuthError(`Google sign-in failed: ${errorMessage}`);
       }
     } finally {
       setIsLoading(false);
