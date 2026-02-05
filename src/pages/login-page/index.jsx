@@ -48,7 +48,8 @@ const LoginPage = () => {
       navigate('/dashboard');
     } catch (error) {
       console.error('Google login error:', error);
-      setAuthError('Google sign-in failed. Please try again.');
+      alert(`Google sign-in failed: ${error.message || 'Unknown error'} (Code: ${error.code})`);
+      setAuthError(`Google sign-in failed: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
