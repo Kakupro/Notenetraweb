@@ -103,7 +103,8 @@ const RegisterPage = () => {
       navigate('/dashboard');
     } catch (error) {
       console.error('Google signup error:', error);
-      alert('Google sign-up failed. Please try again.');
+      alert(`Google sign-up failed: ${error.message || 'Unknown error'}`);
+      console.log("Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
     } finally {
       setIsLoading(false);
     }
