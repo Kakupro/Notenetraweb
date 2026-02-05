@@ -48,8 +48,18 @@ const LoginPage = () => {
       navigate('/dashboard');
     } catch (error) {
       console.error('Google login error:', error);
-      alert(`Google sign-in failed: ${error.message || 'Unknown error'} (Code: ${error.code})`);
-      setAuthError(`Google sign-in failed: ${error.message}`);
+      if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+        // Fallback to redirect
+        try {
+          await loginWithGoogleRedirect();
+          return; // Redirect will happen
+        } catch (redirectError) {
+          setAuthError(`Google sign-in failed: ${redirectError.message}`);
+        }
+      } else {
+        alert(`Google sign-in failed: ${error.message || 'Unknown error'} (Code: ${error.code})`);
+        setAuthError(`Google sign-in failed: ${error.message}`);
+      }
     } finally {
       setIsLoading(false);
     }

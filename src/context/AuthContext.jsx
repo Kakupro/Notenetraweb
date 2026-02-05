@@ -5,7 +5,8 @@ import {
     GoogleAuthProvider,
     signOut,
     onAuthStateChanged,
-    signInWithEmailAndPassword
+    signInWithEmailAndPassword,
+    signInWithRedirect
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
@@ -79,6 +80,11 @@ export const AuthProvider = ({ children }) => {
         return signInWithPopup(auth, provider);
     };
 
+    const loginWithGoogleRedirect = () => {
+        const provider = new GoogleAuthProvider();
+        return signInWithRedirect(auth, provider);
+    };
+
     const logout = () => {
         return signOut(auth);
     };
@@ -89,6 +95,7 @@ export const AuthProvider = ({ children }) => {
         login,
         signup,
         loginWithGoogle,
+        loginWithGoogleRedirect,
         logout
     };
 
