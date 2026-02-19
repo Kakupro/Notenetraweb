@@ -131,24 +131,40 @@ void setup() {
 }
 
 // ------------------ Loop ------------------
+// State variables to prevent multiple counts for the same note
+bool creditObjectPresent = false;
+bool debitObjectPresent = false;
+// Thresholds
+const int DETECTION_mV = 50;  // Signal must be LOWER than this to be a note (High Frequency = Low Time)
+const int RELEASE_mV = 100;   // Signal must be HIGHER than this to reset (Low Frequency = No Note)
+
 void loop() {
   if (!Firebase.ready()) return;
 
-  if (millis() - lastDetectionTime < detectionCooldown) return;
-  
-  unsigned long rCredit = fastRead(CREDIT_OUT, LOW, LOW);
-  unsigned long rDebit = fastRead(DEBIT_OUT, LOW, LOW);
+  unsigned long rCredit = fastRead(CREDIT_OUT, LOW, LOW); // Read S0 sensor (Credit)
+  unsigned long rDebit = fastRead(DEBIT_OUT, LOW, LOW);   // Read S1 sensor (Debit)
 
-  // Serial.printf("C:%lu D:%lu\n", rCredit, rDebit);
-
-  if (rCredit > 0 && rCredit < 50) {
-    Serial.println("CREDIT Detected");
-    sendToFirebase("credit", 100.0, "Auto Credit");
-    lastDetectionTime = millis();
+  // --- CREDIT LOGIC ---
+  // 1. Detect Note (Value is LOW) AND we haven't counted it yet (Object NOT present)
+  if (rCredit > 0 && rCredit < DETECTION_mV && !creditObjectPresent) {
+      Serial.println("CREDIT Detected - Sending...");
+      sendToFirebase("credit", 100.0, "Smart Cash Counter");
+      creditObjectPresent = true; // Lock: We have counted this note
+      delay(500); // Small debounce
   }
-  else if (rDebit > 0 && rDebit < 50) {
-    Serial.println("DEBIT Detected");
-    sendToFirebase("debit", 100.0, "Auto Debit");
-    lastDetectionTime = millis();
+  // 2. Reset Logic (Value is HIGH - Note Removed)
+  else if (rCredit > RELEASE_mV) {
+      creditObjectPresent = false; // Unlock: Ready for next note
+  }
+
+  // --- DEBIT LOGIC ---
+  if (rDebit > 0 && rDebit < DETECTION_mV && !debitObjectPresent) {
+      Serial.println("DEBIT Detected - Sending...");
+      sendToFirebase("debit", 100.0, "Smart Cash Counter");
+      debitObjectPresent = true;
+      delay(500);
+  }
+  else if (rDebit > RELEASE_mV) {
+      debitObjectPresent = false;
   }
 }
