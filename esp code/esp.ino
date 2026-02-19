@@ -1,11 +1,9 @@
-#include <Wire.h>
 #include <WiFi.h>
 #include <Firebase_ESP_Client.h>
-#include <Adafruit_TCS34725.h>
 #include <time.h>
 
 // ------------------ WiFi ------------------
-const char *ssid = "as";
+const char *ssid = "Kaku";
 const char *password = "12345678";
 
 // ------------------ Firebase ------------------
@@ -17,36 +15,34 @@ FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
 
+// REPLACE THIS WITH YOUR USER ID FROM THE WEBSITE DASHBOARD
 String userId = "fxQNVL1gFaeGdGfWUoIi2jNoVJd2"; 
 
-// ------------------ TCS34725 Sensors ------------------
-// Debit sensor (SDA=13, SCL=14)
-TwoWire I2C_debit = TwoWire(0);
-Adafruit_TCS34725 debitSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+// ------------------ Pins ------------------
+// Color Sensor Control Pins
+#define S0 18
+#define S1 19
+#define S2 21
+#define S3 22
 
-// Credit sensor (SDA=21, SCL=23)
-TwoWire I2C_credit = TwoWire(1);
-Adafruit_TCS34725 creditSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
-
-// ------------------ Timezone ------------------
-const char *ntpServer1 = "time.nist.gov";
-const char *ntpServer2 = "in.pool.ntp.org";
-const char *ntpServer3 = "pool.ntp.org";
-const long gmtOffset_sec = 19800;
-const int daylightOffset_sec = 0;
+// Output Pins (Frequency)
+#define CREDIT_OUT 25
+#define DEBIT_OUT 33
 
 // ------------------ Variables ------------------
-int count_100 = 0, count_200 = 0, count_500 = 0;
-float total = 5000.0;
-String lastNote = "None";
-
 unsigned long lastDetectionTime = 0;
-unsigned long detectionCooldown = 3000;
-
-bool debitNotePresent = false;
-bool creditNotePresent = false;
+unsigned long detectionCooldown = 2000;
 
 // ------------------ Helper Functions ------------------
+// Fast Pulse Read (from your code)
+inline unsigned long fastRead(int pin, bool s2, bool s3) {
+  digitalWrite(S2, s2);
+  digitalWrite(S3, s3);
+  delayMicroseconds(100);
+  // pulseIn returns 0 on timeout. Timeout set to 20000 microseconds (20ms)
+  return pulseIn(pin, LOW, 20000);
+}
+
 const char *getStatusString(firebase_auth_token_status status) {
   switch (status) {
     case token_status_uninitialized: return "uninitialized";
@@ -62,8 +58,9 @@ const char *getStatusString(firebase_auth_token_status status) {
 String getTimestamp() {
   time_t now;
   struct tm timeinfo;
-  time(&now);
-  localtime_r(&now, &timeinfo);
+  if(!getLocalTime(&timeinfo)){
+    return "00-00-0000 00:00:00";
+  }
   char buffer[30];
   strftime(buffer, sizeof(buffer), "%d-%m-%Y %H:%M:%S", &timeinfo);
   return String(buffer);
@@ -71,48 +68,30 @@ String getTimestamp() {
 
 void sendToFirebase(String type, float amount, String note) {
   if (Firebase.ready()) {
-    // Use the path structure: transactions/esp/{userId}
-    String transactionPath = "transactions/esp/" + userId;
+    // Get the authenticated user's UID dynamically
+    String currentUserId = auth.token.uid.c_str();  
+    if (currentUserId.length() == 0) {
+      currentUserId = userId; // Fallback to hardcoded ID if auth token is empty
+    }
+    
+    String transactionPath = "transactions/esp/" + currentUserId;
     FirebaseJson json;
     
-    // Create the data structure for the transaction
     json.set("time", getTimestamp());
-    json.set("type", type);
+    json.set("type", type); // "credit" or "debit"
     json.set("amount", amount);
     json.set("mode", "cash");
-    json.set("userID", userId);
+    json.set("userID", currentUserId);
+    json.set("note", note);
 
-    // Use pushJSON to add a new transaction under the specified path
     if (Firebase.RTDB.pushJSON(&fbdo, transactionPath.c_str(), &json)) {
-      Serial.println("Transaction sent to Firebase successfully");
-      Serial.println("Path: " + transactionPath + "/" + fbdo.pushName()); // Show the full path including the generated key
-      Serial.print("Data: ");
-      Serial.println(json.raw());
+      Serial.println("Transaction sent to Firebase successfully: " + type);
     } else {
       Serial.println("Error sending to Firebase: " + fbdo.errorReason());
-      Serial.println("Path attempted: " + transactionPath);
-      Serial.print("Error details: ");
-      Serial.println(fbdo.payload());
     }
   } else {
     Serial.println("Firebase not ready!");
   }
-}
-
-// Updated color detection ranges based on your actual readings
-bool isNote100(uint16_t r, uint16_t g, uint16_t b) {
-  // Based on your readings, 100 Rs note appears to have higher green values
-  return (r >= 30 && r <= 60) && (g >= 50 && g <= 90) && (b >= 40 && b <= 80);
-}
-
-bool isNote200(uint16_t r, uint16_t g, uint16_t b) {
-  // 200 Rs note appears to have balanced RGB values
-  return (r >= 20 && r <= 50) && (g >= 30 && g <= 70) && (b >= 30 && b <= 70);
-}
-
-bool isNote500(uint16_t r, uint16_t g, uint16_t b) {
-  // 500 Rs note appears to have higher red values
-  return (r >= 40 && r <= 80) && (g >= 30 && g <= 60) && (b >= 30 && b <= 60);
 }
 
 void tokenStatusCallback(TokenInfo info) {
@@ -122,23 +101,21 @@ void tokenStatusCallback(TokenInfo info) {
 // ------------------ Setup ------------------
 void setup() {
   Serial.begin(115200);
-  Serial.println("\nStarting Smart Currency Counter...");
+  Serial.println("\nStarting Smart Money Counter (Firebase Edition)...");
 
-  // Initialize I2C for debit and credit sensors
-  I2C_debit.begin(13, 14);
-  I2C_credit.begin(21, 22);
+  // Initialize Pins
+  pinMode(S0, OUTPUT);
+  pinMode(S1, OUTPUT);
+  pinMode(S2, OUTPUT);
+  pinMode(S3, OUTPUT);
+  pinMode(CREDIT_OUT, INPUT);
+  pinMode(DEBIT_OUT, INPUT);
 
-  // Initialize TCS34725 sensors
-  if (!debitSensor.begin(TCS34725_ADDRESS, &I2C_debit)) {
-    Serial.println("Failed to initialize debit TCS34725!");
-  } else {
-    Serial.println("Debit sensor initialized successfully");
-  }
-  if (!creditSensor.begin(TCS34725_ADDRESS, &I2C_credit)) {
-    Serial.println("Failed to initialize credit TCS34725!");
-  } else {
-    Serial.println("Credit sensor initialized successfully");
-  }
+  // Set Scaling to 20% (Common for TCS3200/34725 modules using freq out)
+  // S0=H, S1=L -> 20%
+  // S0=H, S1=H -> 100%
+  digitalWrite(S0, HIGH);
+  digitalWrite(S1, LOW); 
 
   // Connect WiFi
   WiFi.begin(ssid, password);
@@ -149,127 +126,67 @@ void setup() {
   }
   Serial.println("\nConnected! IP: " + WiFi.localIP().toString());
 
-  // Configure time
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer1, ntpServer2, ntpServer3);
+  // Configure Time (Required for timestamp)
+  configTime(19800, 0, "pool.ntp.org", "time.nist.gov"); // GMT+5:30 = 19800 sec
 
   // Initialize Firebase
   config.api_key = API_KEY;
   config.database_url = DATABASE_URL;
   config.token_status_callback = tokenStatusCallback;
-  config.signer.test_mode = true; // anonymous login
+  
+  // Authentication credentials
+  auth.user.email = "notenetra@gmail.com"; 
+  auth.user.password = "Kaku@009"; 
+  
+  // Disable test mode to force email/password authentication
+  config.signer.test_mode = false; 
+  
   Firebase.begin(&config, &auth);
   Firebase.reconnectWiFi(true);
-  Serial.println("Firebase initialized");
-
-  // Wait for Firebase to be ready (which implies authenticated if test_mode is true)
-  unsigned long startMillis = millis();
-  while (!Firebase.ready()) {
-    Serial.print(".");
-    delay(500);
-    if (millis() - startMillis > 10000) { // 10 second timeout
-      Serial.println("\nFirebase initialization timed out!");
-      break;
-    }
-  }
-  if (Firebase.ready()) {
-    Serial.println("\nFirebase is ready and authenticated (anonymous mode).");
-  } else {
-    Serial.println("\nFirebase is NOT ready after timeout. Please check your WiFi connection and Firebase configuration.");
-  }
-  
-  // Ensure the user's transaction path exists as an object in Firebase
-  // This prevents 'Bad request' if the path is currently a primitive value (e.g., empty string)
-  String userTransactionsPath = "transactions/esp/" + userId;
-  if (!Firebase.RTDB.getJSON(&fbdo, userTransactionsPath.c_str())) {
-    // If getJSON fails (e.g., path doesn't exist or is a primitive), set it to an empty JSON object
-    FirebaseJson emptyJson;
-    if (Firebase.RTDB.setJSON(&fbdo, userTransactionsPath.c_str(), &emptyJson)) {
-      Serial.println("Firebase user transactions path initialized as object: " + userTransactionsPath);
-    } else {
-      Serial.println("Failed to initialize Firebase user transactions path: " + fbdo.errorReason());
-    }
-  }
 }
 
 // ------------------ Loop ------------------
 void loop() {
-  if (!Firebase.ready()) {
-    Serial.println("Waiting for Firebase to be ready...");
-    delay(1000);
+  if (!Firebase.ready()) return;
+
+  unsigned long currentMillis = millis();
+  
+  // Simple debounce / cooldown
+  if (currentMillis - lastDetectionTime < detectionCooldown) {
     return;
   }
 
-  unsigned long currentMillis = millis();
-  if (currentMillis - lastDetectionTime < detectionCooldown) return;
+  // Read Sensors
+  // Note: PulseIn blocks for up to 20ms. Two reads = ~40ms max delay.
+  // Using LOW, LOW filters (Clear/No Filter usually, depend on module wiring)
+  // Your code used LOW, LOW on S2, S3 which usually selects 'Red' filter on TCS3200?
+  // TCS3200: S2=L, S3=L -> Red; S2=L, S3=H -> Blue; S2=H, S3=L -> Clear; S2=H, S3=H -> Green
+  // Your code had `fastRead(..., LOW, LOW)` so we keep that logic.
+  
+  unsigned long rCredit = fastRead(CREDIT_OUT, LOW, LOW);
+  unsigned long rDebit = fastRead(DEBIT_OUT, LOW, LOW);
 
-  // Read debit sensor
-  uint16_t r1, g1, b1, c1;
-  debitSensor.getRawData(&r1, &g1, &b1, &c1);
+  // Debug Print
+  // Serial.printf("C:%lu D:%lu\n", rCredit, rDebit);
 
-  // Read credit sensor
-  uint16_t r2, g2, b2, c2;
-  creditSensor.getRawData(&r2, &g2, &b2, &c2);
+  // Threshold Logic (Based on your provided code: >0 && <50)
+  // Using 500ms delay in your code, we use non-blocking cooldown here
+  
+  bool detected = false;
 
-  Serial.printf("\nDebit: R=%d, G=%d, B=%d | Credit: R=%d, G=%d, B=%d\n", r1, g1, b1, r2, g2, b2);
-
-  // Debug color detection
-  Serial.printf("Debit - 100: %s, 200: %s, 500: %s\n", 
-    isNote100(r1,g1,b1) ? "YES" : "NO",
-    isNote200(r1,g1,b1) ? "YES" : "NO", 
-    isNote500(r1,g1,b1) ? "YES" : "NO");
-  Serial.printf("Credit - 100: %s, 200: %s, 500: %s\n", 
-    isNote100(r2,g2,b2) ? "YES" : "NO",
-    isNote200(r2,g2,b2) ? "YES" : "NO", 
-    isNote500(r2,g2,b2) ? "YES" : "NO");
-
-  // Debit detection
-  if (!debitNotePresent) {
-    if (isNote100(r1, g1, b1) && total >= 100) {
-      count_100++; total -= 100; lastNote="100 Rs Debited"; 
-      sendToFirebase("debit",100,"100 Rs Debited"); 
-      debitNotePresent=true;
-      Serial.println("100 Rs Debited!");
-    } else if (isNote200(r1, g1, b1) && total >= 200) {
-      count_200++; total -= 200; lastNote="200 Rs Debited"; 
-      sendToFirebase("debit",200,"200 Rs Debited"); 
-      debitNotePresent=true;
-      Serial.println("200 Rs Debited!");
-    } else if (isNote500(r1, g1, b1) && total >= 500) {
-      count_500++; total -= 500; lastNote="500 Rs Debited"; 
-      sendToFirebase("debit",500,"500 Rs Debited"); 
-      debitNotePresent=true;
-      Serial.println("500 Rs Debited!");
-    }
+  if (rCredit > 0 && rCredit < 50) {
+    Serial.println("Credit Detected! Sending 100 Rs...");
+    sendToFirebase("credit", 100.0, "Auto-detected Credit");
+    detected = true;
+  }
+  else if (rDebit > 0 && rDebit < 50) {
+    Serial.println("Debit Detected! Sending 100 Rs...");
+    sendToFirebase("debit", 100.0, "Auto-detected Debit");
+    detected = true;
   }
 
-  // Credit detection
-  if (!creditNotePresent) {
-    if (isNote100(r2, g2, b2)) { 
-      total += 100; lastNote="100 Rs Credited"; 
-      sendToFirebase("credit",100,"100 Rs Credited"); 
-      creditNotePresent=true;
-      Serial.println("100 Rs Credited!");
-    }
-    else if (isNote200(r2, g2, b2)) { 
-      total += 200; lastNote="200 Rs Credited"; 
-      sendToFirebase("credit",200,"200 Rs Credited"); 
-      creditNotePresent=true;
-      Serial.println("200 Rs Credited!");
-    }
-    else if (isNote500(r2, g2, b2)) { 
-      total += 500; lastNote="500 Rs Credited"; 
-      sendToFirebase("credit",500,"500 Rs Credited"); 
-      creditNotePresent=true;
-      Serial.println("500 Rs Credited!");
-    }
+  if (detected) {
+    lastDetectionTime = currentMillis;
+    // Optional Flash LED or Beep here
   }
-
-  // Reset note presence
-  if (!(isNote100(r1,g1,b1)||isNote200(r1,g1,b1)||isNote500(r1,g1,b1))) debitNotePresent=false;
-  if (!(isNote100(r2,g2,b2)||isNote200(r2,g2,b2)||isNote500(r2,g2,b2))) creditNotePresent=false;
-
-  lastDetectionTime = currentMillis;
-
-  Serial.printf("Balance: Rs %.2f | 100s: %d 200s: %d 500s: %d\n", total, count_100, count_200, count_500);
-  delay(500);
 }

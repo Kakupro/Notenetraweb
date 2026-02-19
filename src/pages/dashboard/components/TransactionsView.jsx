@@ -4,18 +4,63 @@ import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
 import Button from '../../../components/ui/Button';
 import { useAuth } from '../../../context/AuthContext';
+import { getDatabase, ref, onValue, query, orderByChild } from 'firebase/database';
 import { demoData, getTransactionStats } from '../../../utils/demoData';
 
 const TransactionsView = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [dateRange, setDateRange] = useState('7days');
-  const [transactions, setTransactions] = useState(demoData.transactions);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   useEffect(() => {
-    // Logic to load transactions locally or just use demo data
-    setTransactions(demoData.transactions);
+    if (!user?.uid) {
+      setTransactions(demoData.transactions); // Fallback to demo data if not logged in
+      setLoading(false);
+      return;
+    }
+
+    const db = getDatabase();
+    const transactionsRef = ref(db, `transactions/esp/${user.uid}`);
+
+    // Listen for realtime updates
+    const unsubscribe = onValue(transactionsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const transactionList = Object.keys(data).map(key => {
+          const item = data[key];
+          // ESP sends time as "DD-MM-YYYY HH:MM:SS"
+          const [dateStr, timeStr] = item.time ? item.time.split(' ') : ['Unknown', 'Unknown'];
+
+          return {
+            id: key,
+            date: dateStr,
+            time: timeStr,
+            customer: 'Smart Cash Counter', // Source device
+            items: item.note || 'Currency Detection',
+            type: item.mode || 'cash', // 'cash', 'UPI' etc
+            transactionType: item.type, // 'credit' or 'debit'
+            amount: parseFloat(item.amount) || 0,
+            status: 'Completed'
+          };
+        });
+
+        // Reverse to show newest first (since Firebase push IDs generally sort chronologically, but reverse makes it LIFO)
+        setTransactions(transactionList.reverse());
+      } else {
+        // If no data found for this user, show empty state or keep demo data? 
+        // Showing empty state is more honest for a real dashboard.
+        setTransactions([]);
+      }
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching transactions:", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [user]);
 
   const typeOptions = [
@@ -23,8 +68,8 @@ const TransactionsView = () => {
     { value: 'cash', label: 'Cash' },
     { value: 'UPI', label: 'UPI' },
     { value: 'Card', label: 'Card' },
-    { value: 'credit', label: 'Credit (Type)' },
-    { value: 'debit', label: 'Debit (Type)' }
+    { value: 'credit', label: 'Credit (In)' },
+    { value: 'debit', label: 'Debit (Out)' }
   ];
 
   const dateOptions = [
@@ -34,11 +79,10 @@ const TransactionsView = () => {
   ];
 
   const getTypeIcon = (type) => {
-    switch (type) {
-      case 'UPI': return 'Smartphone';
+    switch (type?.toLowerCase()) {
+      case 'upi': return 'Smartphone';
       case 'cash': return 'Banknote';
-      case 'Cash': return 'Banknote';
-      case 'Card': return 'CreditCard';
+      case 'card': return 'CreditCard';
       case 'credit': return 'TrendingUp';
       case 'debit': return 'TrendingDown';
       default: return 'Receipt';
@@ -46,11 +90,10 @@ const TransactionsView = () => {
   };
 
   const getTypeColor = (type) => {
-    switch (type) {
-      case 'UPI': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
+    switch (type?.toLowerCase()) {
+      case 'upi': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
       case 'cash': return 'text-green-400 bg-green-500/10 border-green-500/20';
-      case 'Cash': return 'text-green-400 bg-green-500/10 border-green-500/20';
-      case 'Card': return 'text-purple-400 bg-purple-500/10 border-purple-500/20';
+      case 'card': return 'text-purple-400 bg-purple-500/10 border-purple-500/20';
       case 'credit': return 'text-teal-400 bg-teal-500/10 border-teal-500/20';
       case 'debit': return 'text-red-400 bg-red-500/10 border-red-500/20';
       default: return 'text-gray-400 bg-gray-500/10 border-gray-500/20';
@@ -68,16 +111,23 @@ const TransactionsView = () => {
   const stats = getTransactionStats(filteredTransactions);
   const { totalCredit, totalDebit, totalTransactions, balance } = stats;
 
+  if (loading) {
+    return <div className="p-8 text-center text-gray-400">Loading your transactions...</div>;
+  }
+
   return (
     <div className="p-6 space-y-6">
       <div className="bg-card rounded-xl border border-border p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-foreground">ESP32 Transaction History</h2>
+          <div>
+            <h2 className="text-2xl font-bold text-foreground">ESP32 Transaction History</h2>
+            <p className="text-xs text-muted-foreground mt-1">Live data from your Smart Cash Counter (ID: {user?.uid})</p>
+          </div>
           <Button
             variant="outline"
             iconName="Download"
             iconPosition="left"
-            onClick={() => alert('Export functionality would be implemented here')}
+            onClick={() => alert('Export functionality coming soon')}
           >
             Export
           </Button>
@@ -153,52 +203,55 @@ const TransactionsView = () => {
               <tr className="border-b border-border">
                 <th className="text-left py-3 px-6 font-medium text-muted-foreground">ID</th>
                 <th className="text-left py-3 px-6 font-medium text-muted-foreground">Date & Time</th>
-                <th className="text-left py-3 px-6 font-medium text-muted-foreground">Device</th>
+                <th className="text-left py-3 px-6 font-medium text-muted-foreground">Source</th>
                 <th className="text-left py-3 px-6 font-medium text-muted-foreground">Description</th>
-                <th className="text-left py-3 px-6 font-medium text-muted-foreground">Payment Mode</th>
+                <th className="text-left py-3 px-6 font-medium text-muted-foreground">Mode</th>
                 <th className="text-left py-3 px-6 font-medium text-muted-foreground">Type</th>
                 <th className="text-right py-3 px-6 font-medium text-muted-foreground">Amount</th>
                 <th className="text-center py-3 px-6 font-medium text-muted-foreground">Status</th>
               </tr>
             </thead>
             <tbody>
-              {filteredTransactions?.map((transaction, index) => (
+              {filteredTransactions.map((transaction, index) => (
                 <tr
-                  key={transaction?.id}
+                  key={transaction.id}
                   className={`border-b border-border hover:bg-muted-foreground/10 transition-colors ${index % 2 === 0 ? 'bg-card' : 'bg-background'
                     }`}
                 >
                   <td className="py-4 px-6">
-                    <span className="font-mono text-sm text-primary">{transaction?.id}</span>
+                    <span className="font-mono text-xs text-primary truncate max-w-[80px] block" title={transaction.id}>{transaction.id.substring(0, 8)}...</span>
                   </td>
                   <td className="py-4 px-6">
                     <div className="text-sm">
-                      <div className="font-medium text-foreground">{transaction?.date}</div>
-                      <div className="text-muted-foreground">{transaction?.time}</div>
+                      <div className="font-medium text-foreground">{transaction.date}</div>
+                      <div className="text-muted-foreground">{transaction.time}</div>
                     </div>
                   </td>
                   <td className="py-4 px-6">
-                    <div className="font-medium text-foreground">{transaction?.customer}</div>
+                    <div className="font-medium text-foreground">{transaction.customer}</div>
                   </td>
                   <td className="py-4 px-6">
-                    <div className="text-sm text-muted-foreground max-w-xs truncate" title={transaction?.items}>
-                      {transaction?.items}
+                    <div className="text-sm text-muted-foreground max-w-xs truncate" title={transaction.items}>
+                      {transaction.items}
                     </div>
                   </td>
                   <td className="py-4 px-6">
-                    <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium border ${getTypeColor(transaction?.type)}`}>
-                      <Icon name={getTypeIcon(transaction?.type)} size={14} />
-                      <span>{transaction?.type}</span>
+                    <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium border ${getTypeColor(transaction.type)}`}>
+                      <Icon name={getTypeIcon(transaction.type)} size={14} />
+                      <span>{transaction.type}</span>
                     </div>
                   </td>
                   <td className="py-4 px-6">
-                    <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium border ${getTypeColor(transaction?.transactionType)}`}>
-                      <Icon name={getTypeIcon(transaction?.transactionType)} size={14} />
-                      <span>{transaction?.transactionType?.charAt(0).toUpperCase() + transaction?.transactionType?.slice(1)}</span>
+                    <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium border ${getTypeColor(transaction.transactionType)}`}>
+                      <Icon name={getTypeIcon(transaction.transactionType)} size={14} />
+                      {/* Capitalize first letter */}
+                      <span>{transaction.transactionType ? transaction.transactionType.charAt(0).toUpperCase() + transaction.transactionType.slice(1) : '-'}</span>
                     </div>
                   </td>
                   <td className="py-4 px-6 text-right">
-                    <span className="font-bold text-foreground">₹{transaction?.amount?.toLocaleString('en-IN')}</span>
+                    <span className={`font-bold ${transaction.transactionType === 'credit' ? 'text-green-400' : 'text-red-400'}`}>
+                      {transaction.transactionType === 'credit' ? '+' : '-'} ₹{transaction.amount?.toLocaleString('en-IN')}
+                    </span>
                   </td>
                   <td className="py-4 px-6 text-center">
                     <div className="inline-flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-medium bg-green-500/10 text-green-400 border border-green-500/20">
@@ -212,11 +265,12 @@ const TransactionsView = () => {
           </table>
         </div>
 
-        {filteredTransactions?.length === 0 && (
+        {filteredTransactions.length === 0 && (
           <div className="text-center py-12">
             <Icon name="Search" size={48} color="var(--muted-foreground)" className="mx-auto mb-4" />
             <h3 className="text-lg font-medium text-foreground mb-2">No transactions found</h3>
-            <p className="text-muted-foreground">Try adjusting your search or filter criteria</p>
+            <p className="text-muted-foreground">Make sure your ESP32 is powered on and connected to WiFi.</p>
+            <p className="text-xs text-muted-foreground mt-2 font-mono bg-black/20 inline-block px-2 py-1 rounded">Expected ID: {user?.uid}</p>
           </div>
         )}
       </div>
