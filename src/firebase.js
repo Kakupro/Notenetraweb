@@ -11,14 +11,14 @@ import { getMessaging } from 'firebase/messaging';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyDVjvznBKu1jJYS3STOd-le7Bmn8ToRe1s",
-    authDomain: "notenetra.firebaseapp.com",
-    databaseURL: "https://notenetra-default-rtdb.firebaseio.com",
-    projectId: "notenetra",
-    storageBucket: "notenetra.firebasestorage.app",
-    messagingSenderId: "262092357638",
-    appId: "1:262092357638:web:770c2e8f187a0ebc334387",
-    measurementId: "G-1F2RGLK7RZ"
+    apiKey: "AIzaSyAGuVR7zSOU3HHGOSX_Y8ccaIY4mnKb0Wg",
+    authDomain: "notenetra009.firebaseapp.com",
+    projectId: "notenetra009",
+    storageBucket: "notenetra009.firebasestorage.app",
+    messagingSenderId: "546928743328",
+    appId: "1:546928743328:web:b2810fb75b61e9f2038ac5",
+    measurementId: "G-W6MDZMVG39",
+    databaseURL: "https://notenetra009-default-rtdb.firebaseio.com" // Update this if your RTDB URL is different
 };
 
 // Initialize Firebase

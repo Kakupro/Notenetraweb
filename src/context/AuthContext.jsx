@@ -6,7 +6,8 @@ import {
     signOut,
     onAuthStateChanged,
     signInWithEmailAndPassword,
-    signInWithRedirect
+    signInWithRedirect,
+    createUserWithEmailAndPassword
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
@@ -62,17 +63,25 @@ export const AuthProvider = ({ children }) => {
     };
 
     const signup = async (email, password, additionalData) => {
-        const result = await createUserWithEmailAndPassword(auth, email, password);
-        // Create user document in Firestore with additional data
-        if (result.user) {
-            await setDoc(doc(db, 'users', result.user.uid), {
-                email: email,
-                role: 'user',
-                createdAt: new Date(),
-                ...additionalData
-            });
+        console.log("Signing up with:", email, password);
+        console.log("createUserWithEmailAndPassword function:", createUserWithEmailAndPassword);
+
+        try {
+            const result = await createUserWithEmailAndPassword(auth, email, password);
+            // Create user document in Firestore with additional data
+            if (result.user) {
+                await setDoc(doc(db, 'users', result.user.uid), {
+                    email: email,
+                    role: 'user',
+                    createdAt: new Date(),
+                    ...additionalData
+                });
+            }
+            return result;
+        } catch (error) {
+            console.error("Error in signup function:", error);
+            throw error;
         }
-        return result;
     };
 
     const loginWithGoogle = () => {
